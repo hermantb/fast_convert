@@ -4459,10 +4459,18 @@ fast_ftoa (float v, int size, char *line)
   if (q >= ipowers32[PREC_FLT_NR]) {
     q = (q + 5) / 10;
     exp++;
+    if (q >= ipowers32[PREC_FLT_NR]) {
+      q = (q + 5) / 10;
+      exp++;
+    }
   }
   if (size != PREC_FLT_NR - 1) {
     q = (q + ipowers32[PREC_FLT_NR - 2 - size] * 5) /
       ipowers32[PREC_FLT_NR - 1 - size];
+    if (q >= ipowers32[size + 1]) {
+      q = (q + 5) / 10;
+      exp++;
+    }
     exp += PREC_FLT_NR - size - 1;
   }
 
@@ -4589,11 +4597,27 @@ fast_dtoa (double v, int size, char *line)
     q = div_10 (q + 5);
 #endif
     exp++;
+    if (q >= ipowers64[PREC_DBL_NR]) {
+#if __WORDSIZE == 64
+      q = (q + 5) / 10;
+#else
+      q = div_10 (q + 5);
+#endif
+      exp++;
+    }
   }
   if (size != PREC_DBL_NR - 1) {
     q = (q + ipowers64[PREC_DBL_NR - 2 - size] * 5) /
       ipowers64[PREC_DBL_NR - 1 - size];
     exp += PREC_DBL_NR - size - 1;
+    if (q >= ipowers64[size + 1]) {
+#if __WORDSIZE == 64
+      q = (q + 5) / 10;
+#else
+      q = div_10 (q + 5);
+#endif
+      exp++;
+    }
   }
 
   r = 0;
