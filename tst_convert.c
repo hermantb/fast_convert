@@ -31,8 +31,15 @@ int
 main (int argc, char **argv)
 {
   unsigned int len;
+  unsigned int j;
+  uint64_t df;
+  uint64_t dl;
   uint64_t i;
   uint64_t c;
+  uint64_t cf;
+  uint64_t cl;
+  uint64_t nf = 0;
+  uint64_t nl = 0;
   uint64_t r = 1234567890;
   uint64_t max = UINT64_C (4294967295);
   char *endptr;
@@ -42,12 +49,12 @@ main (int argc, char **argv)
   {
     uint32_t u;
     float f;
-  } tf, rf;
+  } tf, rf, rf2;
   union
   {
     uint64_t ul;
     double d;
-  } td, rd;
+  } td, rd, rd2;
   static const struct
   {
     int32_t v;
@@ -128,20 +135,21 @@ main (int argc, char **argv)
   static const uint32_t ftst[] = {
     0x00000000,
     0x80000000,
-    0x7fc00000,
-    0xffc00000,
-    0x7f800000,
-    0xff800000,
+    0x7FC00000,
+    0XFFC00000,
+    0x7F800000,
+    0xFF800000,
     0x00000001,
     0x00400000,
-    0x3a000000,
-    0x42f68000,
-    0xc2f68000,
-    0x2edbe6ff,
-    0x501502f9,
-    0x4640e400,
-    0x3d800000,
-    0x60ad78ec
+    0x3A000000,
+    0x42F68000,
+    0xC2f68000,
+    0x2EDBE6FF,
+    0x501502F9,
+    0x4640E400,
+    0x3D800000,
+    0x60AD78EC,
+    0x7F7FFFFF
   };
   static const uint64_t dtst[] = {
     0x0000000000000000,
@@ -159,7 +167,9 @@ main (int argc, char **argv)
     0x4202A05F20000000,
     0x40C81C8000000000,
     0x3FB0000000000000,
-    0x4415AF1D78B58C40
+    0x4415AF1D78B58C40,
+    0xEFB04A2E0D69FE4C,
+    0x7FEFFFFFFFFFFFFF,
   };
   char line[1000];
   char line2[1000];
@@ -405,7 +415,8 @@ main (int argc, char **argv)
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   if (strcmp (fast_ftoa (1, 3, line), "1") != 0 ||
-      strcmp (fast_ftoa (100, 4, line), "100") != 0) {
+      strcmp (fast_ftoa (100, 4, line), "100") != 0 ||
+      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") != 0) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
@@ -421,7 +432,8 @@ main (int argc, char **argv)
     printf ("fast_dtoa: size failed: %s\n", line);
   }
   if (strcmp (fast_dtoa (1, 3, line), "1") != 0 ||
-      strcmp (fast_dtoa (100, 4, line), "100") != 0) {
+      strcmp (fast_dtoa (100, 4, line), "100") != 0 ||
+      strcmp (fast_dtoa (9.5202756046990724e-14, 1, line), "1e-13") != 0) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {
@@ -548,12 +560,14 @@ main (int argc, char **argv)
     printf ("  s test float sprintf convert\n");
     printf ("  d test double convert\n");
     printf ("  S test double sprintf convert\n");
-    printf ("  c count differences float\n");
-    printf ("  C count differences float double\n");
     printf ("  g test fast_strtof convert\n");
     printf ("  G test fast_strtod convert\n");
     printf ("  t test strtof convert\n");
     printf ("  T test strtod convert\n");
+    printf ("  p test precision float\n");
+    printf ("  P test precision double\n");
+    printf ("  c count differences float\n");
+    printf ("  C count differences double\n");
     printf ("  if option after first one is 'n' then no check is done\n");
     exit (1);
   }
@@ -678,13 +692,92 @@ main (int argc, char **argv)
       }
     }
   }
+  else if (argv[1][0] == 'p') {
+    max /= 100;
+    for (j = 1; j <= PREC_FLT_NR; j++) {
+      cf = 0;
+      cl = 0;
+      for (i = 0; i <= max; i++) {
+	do {
+	  r = r * RAND_IA + RAND_IC;
+	  tf.u = r;
+	} while (isnan (tf.f) || isinf (tf.f));
+#if 1				/* not real compare because sprintf uses double */
+	fast_ftoa (tf.f, j, line);
+#else
+	fast_dtoa (tf.f, j, line);
+#endif
+	sprintf (line2, "%.*g", j, tf.f);
+	rf.f = strtof (line, NULL);
+	rf2.f = strtof (line2, NULL);
+	df = abs ((int) rf.u - (int) tf.u);
+	dl = abs ((int) rf2.u - (int) tf.u);
+	if (df > dl) {
+	  cf++;
+	}
+	if (df < dl) {
+	  cl++;
+	}
+	if (df != dl && argc > 2) {
+	  printf ("%s: %u %u %u %u %s %s %.9g\n", df > dl ? "fast" : "libc",
+		  j, rf.u, rf2.u, tf.u, line, line2, tf.f);
+	}
+      }
+      printf ("%u: fast %" PRIu64 ", libc %" PRIu64 "\n", j, cf, cl);
+      nf += cf;
+      nl += cl;
+    }
+    printf ("fast: %" PRIu64 ", libc: %" PRIu64 "\n", nf, nl);
+  }
+  else if (argv[1][0] == 'P') {
+    max /= 100;
+    for (j = 1; j <= PREC_DBL_NR; j++) {
+      cf = 0;
+      cl = 0;
+      for (i = 0; i <= max; i++) {
+	do {
+	  r = r * RAND_IA + RAND_IC;
+	  td.ul = r;
+	} while (isnan (td.d) || isinf (td.d));
+	fast_dtoa (td.d, j, line);
+	sprintf (line2, "%.*g", j, td.d);
+	rd.d = strtod (line, NULL);
+	rd2.d = strtod (line2, NULL);
+	df = llabs ((long long) rd.ul - (long long) td.ul);
+	dl = llabs ((long long) rd2.ul - (long long) td.ul);
+	if (df > dl) {
+	  cf++;
+	}
+	if (df < dl) {
+	  cl++;
+	}
+	if (df != dl && argc > 2) {
+	  printf ("%s: %u %" PRIu64 " %" PRIu64 " %" PRIu64 " %s %s %.17g\n",
+		  df > dl ? "fast" : "libc", j, rd.ul, rd2.ul, td.ul, line,
+		  line2, td.d);
+	}
+      }
+      printf ("%u: fast %" PRIu64 ", libc %" PRIu64 "\n", j, cf, cl);
+      nf += cf;
+      nl += cl;
+    }
+    printf ("fast: %" PRIu64 ", libc: %" PRIu64 "\n", nf, nl);
+  }
   else if (argv[1][0] == 'c') {
     c = 0;
     for (i = 0; i <= max; i++) {
       tf.u = i;
+#if 1				/* not real compare because sprintf uses double */
       fast_ftoa (tf.f, PREC_FLT_NR, line);
+#else
+      fast_dtoa (tf.f, PREC_FLT_NR, line);
+#endif
       sprintf (line2, "%." PREC_FLT "g", tf.f);
-      c += strcmp (line, line2) != 0;
+      j = strcmp (line, line2) != 0;
+      c += j;
+      if (j && argc > 2) {
+        printf ("%s %s\n", line, line2);
+      }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
   }
@@ -693,9 +786,13 @@ main (int argc, char **argv)
     for (i = 0; i <= max; i++) {
       r = r * RAND_IA + RAND_IC;
       td.ul = r;
-      fast_dtoa (td.d, PREC_FLT_NR, line);
-      sprintf (line2, "%." PREC_FLT "g", td.d);
-      c += strcmp (line, line2) != 0;
+      fast_dtoa (td.d, PREC_DBL_NR, line);
+      sprintf (line2, "%." PREC_DBL "g", td.d);
+      j = strcmp (line, line2) != 0;
+      c += j;
+      if (j && argc > 2) {
+        printf ("%s %s\n", line, line2);
+      }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
   }
