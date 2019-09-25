@@ -149,6 +149,10 @@ main (int argc, char **argv)
     0x4640E400,
     0x3D800000,
     0x60AD78EC,
+    0x19416D9A,
+    0xBDAB80D9,
+    0x3D800000,
+    0x015965DC,
     0x7F7FFFFF
   };
   static const uint64_t dtst[] = {
@@ -169,6 +173,10 @@ main (int argc, char **argv)
     0x3FB0000000000000,
     0x4415AF1D78B58C40,
     0xEFB04A2E0D69FE4C,
+    0xA630920E8868104F,
+    0xC2AB41C01CE507A0,
+    0xFAFE218675E0741B,
+    0x0030000000000000,
     0x7FEFFFFFFFFFFFFF,
   };
   char line[1000];
@@ -416,7 +424,9 @@ main (int argc, char **argv)
   }
   if (strcmp (fast_ftoa (1, 3, line), "1") != 0 ||
       strcmp (fast_ftoa (100, 4, line), "100") != 0 ||
-      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") != 0) {
+      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") != 0 ||
+      strcmp (fast_ftoa (295000000.0, 2, line), "3e+08") != 0 ||
+      strcmp (fast_ftoa (-531790.812, 9, line), "-531790.812") != 0) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
@@ -433,6 +443,7 @@ main (int argc, char **argv)
   }
   if (strcmp (fast_dtoa (1, 3, line), "1") != 0 ||
       strcmp (fast_dtoa (100, 4, line), "100") != 0 ||
+      strcmp (fast_dtoa (107696295750000, 10, line), "1.076962958e+14") != 0 ||
       strcmp (fast_dtoa (9.5202756046990724e-14, 1, line), "1e-13") != 0) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
@@ -708,8 +719,8 @@ main (int argc, char **argv)
 	fast_dtoa (tf.f, j, line);
 #endif
 	sprintf (line2, "%.*g", j, tf.f);
-	rf.f = strtof (line, NULL);
-	rf2.f = strtof (line2, NULL);
+	rf.f = fast_strtof (line, NULL);
+	rf2.f = fast_strtof (line2, NULL);
 	df = abs ((int) rf.u - (int) tf.u);
 	dl = abs ((int) rf2.u - (int) tf.u);
 	if (df > dl) {
@@ -741,8 +752,8 @@ main (int argc, char **argv)
 	} while (isnan (td.d) || isinf (td.d));
 	fast_dtoa (td.d, j, line);
 	sprintf (line2, "%.*g", j, td.d);
-	rd.d = strtod (line, NULL);
-	rd2.d = strtod (line2, NULL);
+	rd.d = fast_strtod (line, NULL);
+	rd2.d = fast_strtod (line2, NULL);
 	df = llabs ((long long) rd.ul - (long long) td.ul);
 	dl = llabs ((long long) rd2.ul - (long long) td.ul);
 	if (df > dl) {
@@ -776,7 +787,7 @@ main (int argc, char **argv)
       j = strcmp (line, line2) != 0;
       c += j;
       if (j && argc > 2) {
-        printf ("%s %s\n", line, line2);
+        printf ("%u %s %s %.17g\n", tf.u, line, line2, tf.f);
       }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
@@ -791,7 +802,7 @@ main (int argc, char **argv)
       j = strcmp (line, line2) != 0;
       c += j;
       if (j && argc > 2) {
-        printf ("%s %s\n", line, line2);
+        printf ("%" PRIu64 " %s %s\n", td.ul, line, line2);
       }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
