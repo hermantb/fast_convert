@@ -184,26 +184,26 @@ main (int argc, char **argv)
 
   for (i = 0; i < sizeof (sitst) / sizeof (sitst[0]); i++) {
     len = fast_sint32 (sitst[i].v, line);
-    if (strcmp (line, sitst[i].r) != 0 || len != strlen (sitst[i].r)) {
+    if (strcmp (line, sitst[i].r) || len != strlen (sitst[i].r)) {
       printf ("fast_sint32: conversion failed for %d %s\n", sitst[i].v, line);
     }
   }
   for (i = 0; i < sizeof (uitst) / sizeof (uitst[0]); i++) {
     len = fast_uint32 (uitst[i].v, line);
-    if (strcmp (line, uitst[i].r) != 0 || len != strlen (uitst[i].r)) {
+    if (strcmp (line, uitst[i].r) || len != strlen (uitst[i].r)) {
       printf ("fast_uint32: conversion failed for %u %s\n", uitst[i].v, line);
     }
   }
   for (i = 0; i < sizeof (sltst) / sizeof (sltst[0]); i++) {
     len = fast_sint64 (sltst[i].v, line);
-    if (strcmp (line, sltst[i].r) != 0 || len != strlen (sltst[i].r)) {
+    if (strcmp (line, sltst[i].r) || len != strlen (sltst[i].r)) {
       printf ("fast_sint64: conversion failed for %" PRId64 " %s\n",
 	      sltst[i].v, line);
     }
   }
   for (i = 0; i < sizeof (ultst) / sizeof (ultst[0]); i++) {
     len = fast_uint64 (ultst[i].v, line);
-    if (strcmp (line, ultst[i].r) != 0 || len != strlen (ultst[i].r)) {
+    if (strcmp (line, ultst[i].r) || len != strlen (ultst[i].r)) {
       printf ("fast_uint64: conversion failed for %" PRIu64 " %s\n",
 	      ultst[i].v, line);
     }
@@ -245,7 +245,7 @@ main (int argc, char **argv)
     }
   }
   fast_strtos32 ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
   fast_strtos32 ("0x7fffffff0", &endptr);
@@ -294,7 +294,7 @@ main (int argc, char **argv)
     }
   }
   fast_strtou32 ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtou32: failed endptr %s\n", endptr);
   }
   fast_strtou32 ("0x100000001", &endptr);
@@ -346,7 +346,7 @@ main (int argc, char **argv)
     }
   }
   fast_strtos64 ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
   fast_strtos64 ("0x7FFFFFFFFFFFFFFF0", &endptr);
@@ -395,7 +395,7 @@ main (int argc, char **argv)
     }
   }
   fast_strtou64 ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
   fast_strtou64 ("0x10000000000000001", &endptr);
@@ -418,15 +418,15 @@ main (int argc, char **argv)
       printf ("fast_ftoa: failed 0x%08x %s\n", ftst[i], line);
     }
   }
-  if (strcmp (fast_ftoa (1, PREC_FLT_NR + 1, line), "1") != 0 ||
-      strcmp (fast_ftoa (1, -1, line), "1") != 0) {
+  if (strcmp (fast_ftoa (1, PREC_FLT_NR + 1, line), "1") ||
+      strcmp (fast_ftoa (1, -1, line), "1")) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
-  if (strcmp (fast_ftoa (1, 3, line), "1") != 0 ||
-      strcmp (fast_ftoa (100, 4, line), "100") != 0 ||
-      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") != 0 ||
-      strcmp (fast_ftoa (295000000.0, 2, line), "3e+08") != 0 ||
-      strcmp (fast_ftoa (-531790.812, 9, line), "-531790.812") != 0) {
+  if (strcmp (fast_ftoa (1, 3, line), "1") ||
+      strcmp (fast_ftoa (100, 4, line), "100") ||
+      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") ||
+      strcmp (fast_ftoa (295000000.0, 2, line), "3e+08") ||
+      strcmp (fast_ftoa (-531790.812, 9, line), "-531790.812")) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
@@ -437,19 +437,25 @@ main (int argc, char **argv)
       printf ("fast_dtoa: failed 0x%016" PRIx64 " %s\n", dtst[i], line);
     }
   }
-  if (strcmp (fast_dtoa (1, PREC_DBL_NR + 1, line), "1") != 0 ||
-      strcmp (fast_dtoa (1, -1, line), "1") != 0) {
+  if (strcmp (fast_dtoa (1, PREC_DBL_NR + 1, line), "1") ||
+      strcmp (fast_dtoa (1, -1, line), "1")) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
-  if (strcmp (fast_dtoa (1, 3, line), "1") != 0 ||
-      strcmp (fast_dtoa (100, 4, line), "100") != 0 ||
-      strcmp (fast_dtoa (107696295750000, 10, line), "1.076962958e+14") != 0 ||
-      strcmp (fast_dtoa (9.5202756046990724e-14, 1, line), "1e-13") != 0) {
+  if (strcmp (fast_dtoa (1, 3, line), "1") ||
+      strcmp (fast_dtoa (100, 4, line), "100") ||
+      strcmp (fast_dtoa (107696295750000, 10, line), "1.076962958e+14") ||
+      strcmp (fast_dtoa (9.5202756046990724e-14, 1, line), "1e-13")) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {
     tf.u = ftst[i];
     sprintf (line, "%." PREC_FLT "g", tf.f);
+    rf.f = fast_strtof (line, &endptr);
+    if (rf.u != tf.u || *endptr != '\0') {
+      printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
+    }
+    tf.u = ftst[i];
+    sprintf (line, "%.30g", tf.f);
     rf.f = fast_strtof (line, &endptr);
     if (rf.u != tf.u || *endptr != '\0') {
       printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
@@ -468,7 +474,7 @@ main (int argc, char **argv)
     }
   }
   fast_strtof ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtof: failed endptr %s\n", endptr);
   }
   if (fast_strtof (" +1.0", &endptr) != 1.0 || *endptr != '\0') {
@@ -505,28 +511,38 @@ main (int argc, char **argv)
       *endptr != '\0') {
     printf ("fast_strtof: hex conversion failed %s\n", endptr);
   }
+  if (fast_strtof ("0.5000000894069671630859375", &endptr) !=
+      0.5000000894069671630859375f || *endptr != '\0') {
+    printf ("fast_strtof: conversion failed %s\n", endptr);
+  }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
     td.ul = dtst[i];
     sprintf (line, "%." PREC_DBL "g", td.d);
     rd.d = fast_strtod (line, &endptr);
     if (rd.ul != td.ul || *endptr != '\0') {
-      printf ("fast_strtod: failed 0x%16" PRIx64 "x %s\n", dtst[i], line);
+      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
+    }
+    td.ul = dtst[i];
+    sprintf (line, "%.40g", td.d);
+    rd.d = fast_strtod (line, &endptr);
+    if (rd.ul != td.ul || *endptr != '\0') {
+      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
     }
     td.ul = dtst[i];
     sprintf (line, "%a", td.d);
     rd.d = fast_strtod (line, &endptr);
     if (rd.ul != td.ul || *endptr != '\0') {
-      printf ("fast_strtod: failed 0x%16" PRIx64 "x %s\n", dtst[i], line);
+      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
     }
     td.ul = dtst[i];
     sprintf (line, "%A", td.d);
     rd.d = fast_strtod (line, &endptr);
     if (rd.ul != td.ul || *endptr != '\0') {
-      printf ("fast_strtod: failed 0x%16" PRIx64 "x %s\n", dtst[i], line);
+      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
     }
   }
   fast_strtod ("error", &endptr);
-  if (strcmp (endptr, "error") != 0) {
+  if (strcmp (endptr, "error")) {
     printf ("fast_strtod: failed endptr %s\n", endptr);
   }
   if (fast_strtod (" +1.0", &endptr) != 1.0 || *endptr != '\0') {
@@ -563,6 +579,39 @@ main (int argc, char **argv)
   if (fast_strtod (" 0Xf.000Ff000000000000", &endptr) != 15.000243186950684 ||
       *endptr != '\0') {
     printf ("fast_strtod: hex conversion failed %s\n", endptr);
+  }
+  if (fast_strtod ("3.571e266", &endptr) != 3.571e266 || *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod
+      ("0.500000000000000166533453693773481063544750213623046875",
+       &endptr) != 0.500000000000000166533453693773481063544750213623046875 ||
+      *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod ("3.518437208883201171875e13", &endptr) !=
+      3.518437208883201171875e13 || *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod ("62.5364939768271845828", &endptr) !=
+      62.5364939768271845828 || *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod ("8.10109172351e-10", &endptr) != 8.10109172351e-10 ||
+      *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod
+      ("1.50000000000000011102230246251565404236316680908203125",
+       &endptr) != 1.50000000000000011102230246251565404236316680908203125 ||
+      *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
+  }
+  if (fast_strtod
+      ("9007199254740991.4999999999999999999999999999999995",
+       &endptr) != 9007199254740991.4999999999999999999999999999999995 ||
+      *endptr != '\0') {
+    printf ("fast_strtod: conversion failed %s\n", endptr);
   }
   if (argc < 2 || strlen (argv[1]) == 0) {
     printf ("Usage: %s option\n", argv[0]);
@@ -784,10 +833,10 @@ main (int argc, char **argv)
       fast_dtoa (tf.f, PREC_FLT_NR, line);
 #endif
       sprintf (line2, "%." PREC_FLT "g", tf.f);
-      j = strcmp (line, line2) != 0;
+      j = strcmp (line, line2);
       c += j;
       if (j && argc > 2) {
-        printf ("%u %s %s %.17g\n", tf.u, line, line2, tf.f);
+	printf ("%u %s %s %.17g\n", tf.u, line, line2, tf.f);
       }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
@@ -799,10 +848,10 @@ main (int argc, char **argv)
       td.ul = r;
       fast_dtoa (td.d, PREC_DBL_NR, line);
       sprintf (line2, "%." PREC_DBL "g", td.d);
-      j = strcmp (line, line2) != 0;
+      j = strcmp (line, line2);
       c += j;
       if (j && argc > 2) {
-        printf ("%" PRIu64 " %s %s\n", td.ul, line, line2);
+	printf ("%" PRIu64 " %s %s\n", td.ul, line, line2);
       }
     }
     printf ("%" PRIu64 " %.2f%%\n", c, 100.0 * c / max);
