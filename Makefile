@@ -8,10 +8,10 @@ CC = gcc
 
 all: tst_convert64 tst_convert32
 
-tst_convert64: fast_convert.c tst_convert.c
+tst_convert64: fast_convert.h fast_convert.c tst_convert.c
 	${CC} ${OPTIONS} fast_convert.c tst_convert.c -o tst_convert64
 
-tst_convert32: fast_convert.c tst_convert.c
+tst_convert32: fast_convert.h fast_convert.c tst_convert.c
 	${CC} -m32 ${OPTIONS} fast_convert.c tst_convert.c -o tst_convert32
 
 test: tst_convert64 tst_convert32
@@ -48,5 +48,8 @@ test: tst_convert64 tst_convert32
 	./tst_convert32 Gn
 	./tst_convert32 Tn
 
+doc: fast_convert.h README.md
+	doxygen
+
 clean:
-	rm -f tst_convert64 tst_convert32
+	rm -rf tst_convert64 tst_convert32 doc
