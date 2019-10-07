@@ -6,13 +6,22 @@ CC = gcc
 # export ASAN_OPTIONS='detect_invalid_pointer_pairs=2'
 # export LSAN_OPTIONS=''
 
-all: tst_convert64 tst_convert32
+all: tst_convert64 tst_convert32 libfast_convert.a libfast_convert.so
 
 tst_convert64: fast_convert.h fast_convert.c tst_convert.c
 	${CC} ${OPTIONS} fast_convert.c tst_convert.c -o tst_convert64
 
 tst_convert32: fast_convert.h fast_convert.c tst_convert.c
 	${CC} -m32 ${OPTIONS} fast_convert.c tst_convert.c -o tst_convert32
+
+libfast_convert.a: fast_convert.h fast_convert.c
+	${CC} ${OPTIONS} -c fast_convert.c
+	rm -f libfast_convert.a
+	ar rv libfast_convert.a fast_convert.o
+	rm -f fast_convert.o
+
+libfast_convert.so: fast_convert.h fast_convert.c
+	${CC} ${OPTIONS} -fPIC -shared -o libfast_convert.so fast_convert.c
 
 test: tst_convert64 tst_convert32
 	./tst_convert64 f
@@ -52,4 +61,4 @@ doc: fast_convert.h README.md
 	doxygen
 
 clean:
-	rm -rf tst_convert64 tst_convert32 doc
+	rm -rf tst_convert64 tst_convert32 libfast_convert.a libfast_convert.so doc 
