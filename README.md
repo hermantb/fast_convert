@@ -142,6 +142,10 @@ C:   4439.85 0 0.00%
 
 </pre>
 
+## Locale 
+
+The locale decimal point is set at startup. If an application needs to use a different locale it has to call localeconv() to update the decimal point.
+
 ## License
   
 Licensed under either of

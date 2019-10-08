@@ -10,6 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <locale.h>
 #include "fast_convert.h"
 
 #ifndef __WORDSIZE
@@ -3905,6 +3906,23 @@ static const char num3[3000] = {
   '9', '9', '5', '9', '9', '6', '9', '9', '7', '9', '9', '8', '9', '9', '9',
 };
 
+#define	DECIMAL_POINT	(*lconv->decimal_point)
+
+static struct lconv default_lconv = { .decimal_point = "." };
+static struct lconv *lconv = &default_lconv;
+
+/** \brief init_fast_convert
+ * 
+ * \b Description
+ *
+ * Update decimal_point from locale at startup
+ */
+static void __attribute__ ((constructor))
+init_fast_convert (void)
+{
+  lconv = localeconv();
+}
+
 #ifndef __GNUC__
 
 #define	USE_FAST_CTZ	1
@@ -5011,7 +5029,7 @@ fast_ftoa (float v, int size, char *line)
     exp += size - r;
     if (exp < 0) {
       *s++ = '0';
-      *s++ = '.';
+      *s++ = DECIMAL_POINT;
       while (++exp < 0) {
 	*s++ = '0';
       }
@@ -5023,7 +5041,7 @@ fast_ftoa (float v, int size, char *line)
 	s[0] = s[1];
 	s++;
 	if (exp-- == 0) {
-	  *s++ = '.';
+	  *s++ = DECIMAL_POINT;
 	  s += l;
 	  break;
 	}
@@ -5035,7 +5053,7 @@ fast_ftoa (float v, int size, char *line)
     s[0] = s[1];
     s++;
     if (l > 1) {
-      *s = '.';
+      *s = DECIMAL_POINT;
       s += l;
     }
     exp += size - r;
@@ -5212,7 +5230,7 @@ fast_dtoa (double v, int size, char *line)
     exp += size - r;
     if (exp < 0) {
       *s++ = '0';
-      *s++ = '.';
+      *s++ = DECIMAL_POINT;
       while (++exp < 0) {
 	*s++ = '0';
       }
@@ -5224,7 +5242,7 @@ fast_dtoa (double v, int size, char *line)
 	s[0] = s[1];
 	s++;
 	if (exp-- == 0) {
-	  *s++ = '.';
+	  *s++ = DECIMAL_POINT;
 	  s += l;
 	  break;
 	}
@@ -5236,7 +5254,7 @@ fast_dtoa (double v, int size, char *line)
     s[0] = s[1];
     s++;
     if (l > 1) {
-      *s = '.';
+      *s = DECIMAL_POINT;
       s += l;
     }
     exp += size - r;
@@ -5342,7 +5360,7 @@ fast_strtof (const char *str, char **endptr)
     return 0.0;
   }
   if (*cp == '0' && (cp[1] == 'x' || cp[1] == 'X')) {
-    if (!isxdigit (cp[2]) && (cp[2] != '.' || !isxdigit (cp[3]))) {
+    if (!isxdigit (cp[2]) && (cp[2] != DECIMAL_POINT || !isxdigit (cp[3]))) {
       if (endptr) {
 	*endptr = &cp[1];
       }
@@ -5372,7 +5390,7 @@ fast_strtof (const char *str, char **endptr)
 	c++;
       }
     }
-    if (*cp == '.') {
+    if (*cp == DECIMAL_POINT) {
       cp++;
       while (isxdigit (*cp)) {
 	if (c < 16) {
@@ -5426,7 +5444,7 @@ fast_strtof (const char *str, char **endptr)
     /* sets ERANGE and returns HUGE_VAL on error */
     return ldexpf (n, exp) * (sign ? -1.0 : 1.0);
   }
-  if (!isdigit (*cp) && (*cp != '.' || !isdigit (cp[1]))) {
+  if (!isdigit (*cp) && (*cp != DECIMAL_POINT || !isdigit (cp[1]))) {
     if (endptr) {
       *endptr = (char *) str;
     }
@@ -5447,7 +5465,7 @@ fast_strtof (const char *str, char **endptr)
       c++;
     }
   }
-  if (*cp == '.') {
+  if (*cp == DECIMAL_POINT) {
     cp++;
     while (isdigit (*cp)) {
       if (c < 19) {
@@ -5591,7 +5609,7 @@ fast_strtod (const char *str, char **endptr)
     return 0.0;
   }
   if (*cp == '0' && (cp[1] == 'x' || cp[1] == 'X')) {
-    if (!isxdigit (cp[2]) && (cp[2] != '.' || !isxdigit (cp[3]))) {
+    if (!isxdigit (cp[2]) && (cp[2] != DECIMAL_POINT || !isxdigit (cp[3]))) {
       if (endptr) {
 	*endptr = &cp[1];
       }
@@ -5621,7 +5639,7 @@ fast_strtod (const char *str, char **endptr)
 	c++;
       }
     }
-    if (*cp == '.') {
+    if (*cp == DECIMAL_POINT) {
       cp++;
       while (isxdigit (*cp)) {
 	if (c < 16) {
@@ -5675,7 +5693,7 @@ fast_strtod (const char *str, char **endptr)
     /* sets ERANGE and returns HUGE_VAL on error */
     return ldexp (n1, exp) * (sign ? -1.0 : 1.0);
   }
-  if (!isdigit (*cp) && (*cp != '.' || !isdigit (cp[1]))) {
+  if (!isdigit (*cp) && (*cp != DECIMAL_POINT || !isdigit (cp[1]))) {
     if (endptr) {
       *endptr = (char *) str;
     }
@@ -5704,7 +5722,7 @@ fast_strtod (const char *str, char **endptr)
       c++;
     }
   }
-  if (*cp == '.') {
+  if (*cp == DECIMAL_POINT) {
     cp++;
     while (c < 19 && isdigit (*cp)) {
       n2 = n2 * 10 + (*cp - '0');
