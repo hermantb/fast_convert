@@ -1,5 +1,6 @@
 OPTIONS = -g -O3 -Wall
 CC = gcc
+WIN_GCC = i686-w64-mingw32-gcc
 
 # -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined
 # -fsanitize-address-use-after-scope
@@ -57,8 +58,14 @@ test: tst_convert64 tst_convert32
 	./tst_convert32 Gn
 	./tst_convert32 Tn
 
+allwin: tst_convert64.exe
+
+tst_convert64.exe: fast_convert.c tst_convert.c
+	$(WIN_GCC) ${OPTIONS} -DWIN fast_convert.c tst_convert.c -o tst_convert64.exe
+
 doc: fast_convert.h README.md
 	doxygen
 
 clean:
 	rm -rf tst_convert64 tst_convert32 libfast_convert.a libfast_convert.so doc 
+	rm -f tst_convert64.exe

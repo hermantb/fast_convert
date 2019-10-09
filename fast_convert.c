@@ -3908,7 +3908,8 @@ static const char num3[3000] = {
 
 #define	DECIMAL_POINT	(*lconv->decimal_point)
 
-static struct lconv default_lconv = { .decimal_point = "." };
+static struct lconv default_lconv = {.decimal_point = "." };
+
 static struct lconv *lconv = &default_lconv;
 
 /** \brief init_fast_convert
@@ -3917,10 +3918,10 @@ static struct lconv *lconv = &default_lconv;
  *
  * Update decimal_point from locale at startup
  */
-static void __attribute__ ((constructor))
-init_fast_convert (void)
+static void __attribute__((constructor))
+  init_fast_convert (void)
 {
-  lconv = localeconv();
+  lconv = localeconv ();
 }
 
 #ifndef __GNUC__
@@ -4059,6 +4060,9 @@ log10_64 (uint64_t v)
   if (v == 0) {
     return 1;
   }
+#ifdef WIN
+  n = tab64[63 ^ __builtin_clzll (v)];
+#else
 #ifdef __GNUC__
 #if __WORDSIZE == 64
   n = tab64[63 ^ __builtin_clzl (v)];
@@ -4067,6 +4071,7 @@ log10_64 (uint64_t v)
 #endif
 #else
   n = tab64[63 ^ calc_clz64 (v)];
+#endif
 #endif
   return n + (v >= ipowers64[n]);
 }
@@ -5509,6 +5514,9 @@ fast_strtof (const char *str, char **endptr)
     *endptr = cp;
   }
   if (n && (exp >= -64 && exp <= 39)) {
+#ifdef WIN
+    unsigned int s = __builtin_clzll (n);
+#else
 #ifdef __GNUC__
 #if __WORDSIZE == 64
     unsigned int s = __builtin_clzl (n);
@@ -5517,6 +5525,7 @@ fast_strtof (const char *str, char **endptr)
 #endif
 #else
     unsigned int s = calc_clz64 (n);
+#endif
 #endif
 
     /* sets ERANGE and returns HUGE_VAL on error */
@@ -5780,6 +5789,9 @@ fast_strtod (const char *str, char **endptr)
     c = 0;
   }
   if (n1 && (exp >= -362 && exp <= 309)) {
+#ifdef WIN
+    unsigned int s = __builtin_clzll (n1);
+#else
 #ifdef __GNUC__
 #if __WORDSIZE == 64
     unsigned int s = __builtin_clzl (n1);
@@ -5788,6 +5800,7 @@ fast_strtod (const char *str, char **endptr)
 #endif
 #else
     unsigned int s = calc_clz64 (n1);
+#endif
 #endif
 
     n1 = (n1 << s) | (n2 >> (64 - s));

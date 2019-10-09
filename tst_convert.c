@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -21,10 +22,17 @@
 static double
 get_time (void)
 {
+#ifdef WIN
+  struct timeval tv;
+
+  gettimeofday (&tv, NULL);
+  return ((double) tv.tv_sec) * 1e9 + ((double) tv.tv_usec) * 1e3;
+#else
   struct timespec curtime;
 
   clock_gettime (CLOCK_REALTIME, &curtime);
   return ((double) curtime.tv_sec) * 1e9 + ((double) curtime.tv_nsec);
+#endif
 }
 
 int
@@ -449,17 +457,24 @@ main (int argc, char **argv)
   }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {
     tf.u = ftst[i];
-    sprintf (line, "%." PREC_FLT "g", tf.f);
-    rf.f = fast_strtof (line, &endptr);
-    if (rf.u != tf.u || *endptr != '\0') {
-      printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
+#ifdef WIN
+    if (!isnan (tf.f) && !isinf (tf.f)) {
+#endif
+      sprintf (line, "%." PREC_FLT "g", tf.f);
+      rf.f = fast_strtof (line, &endptr);
+      if (rf.u != tf.u || *endptr != '\0') {
+	printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
+      }
+      tf.u = ftst[i];
+      sprintf (line, "%.30g", tf.f);
+      rf.f = fast_strtof (line, &endptr);
+      if (rf.u != tf.u || *endptr != '\0') {
+	printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
+      }
+#ifdef WIN
     }
-    tf.u = ftst[i];
-    sprintf (line, "%.30g", tf.f);
-    rf.f = fast_strtof (line, &endptr);
-    if (rf.u != tf.u || *endptr != '\0') {
-      printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
-    }
+#endif
+#ifndef WIN
     tf.u = ftst[i];
     sprintf (line, "%a", tf.f);
     rf.f = fast_strtof (line, &endptr);
@@ -472,6 +487,7 @@ main (int argc, char **argv)
     if (rf.u != tf.u || *endptr != '\0') {
       printf ("fast_strtof: failed 0x%08x %s\n", ftst[i], line);
     }
+#endif
   }
   fast_strtof ("error", &endptr);
   if (strcmp (endptr, "error")) {
@@ -517,17 +533,24 @@ main (int argc, char **argv)
   }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
     td.ul = dtst[i];
-    sprintf (line, "%." PREC_DBL "g", td.d);
-    rd.d = fast_strtod (line, &endptr);
-    if (rd.ul != td.ul || *endptr != '\0') {
-      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
+#ifdef WIN
+    if (!isnan (td.d) && !isinf (td.d)) {
+#endif
+      sprintf (line, "%." PREC_DBL "g", td.d);
+      rd.d = fast_strtod (line, &endptr);
+      if (rd.ul != td.ul || *endptr != '\0') {
+	printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
+      }
+      td.ul = dtst[i];
+      sprintf (line, "%.40g", td.d);
+      rd.d = fast_strtod (line, &endptr);
+      if (rd.ul != td.ul || *endptr != '\0') {
+	printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
+      }
+#ifdef WIN
     }
-    td.ul = dtst[i];
-    sprintf (line, "%.40g", td.d);
-    rd.d = fast_strtod (line, &endptr);
-    if (rd.ul != td.ul || *endptr != '\0') {
-      printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
-    }
+#endif
+#ifndef WIN
     td.ul = dtst[i];
     sprintf (line, "%a", td.d);
     rd.d = fast_strtod (line, &endptr);
@@ -540,6 +563,7 @@ main (int argc, char **argv)
     if (rd.ul != td.ul || *endptr != '\0') {
       printf ("fast_strtod: failed 0x%016" PRIx64 "x %s\n", dtst[i], line);
     }
+#endif
   }
   fast_strtod ("error", &endptr);
   if (strcmp (endptr, "error")) {
