@@ -426,15 +426,25 @@ main (int argc, char **argv)
       printf ("fast_ftoa: failed 0x%08x %s\n", ftst[i], line);
     }
   }
-  if (strcmp (fast_ftoa (1, PREC_FLT_NR + 1, line), "1") ||
-      strcmp (fast_ftoa (1, -1, line), "1")) {
+  if (fast_ftoa (1, PREC_FLT_NR + 1, line) != 1 ||
+      strcmp (line, "1") ||
+      fast_ftoa (1, -1, line) != 1 ||
+      strcmp (line, "1")) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
-  if (strcmp (fast_ftoa (1, 3, line), "1") ||
-      strcmp (fast_ftoa (100, 4, line), "100") ||
-      strcmp (fast_ftoa (965447232.0, 1, line), "1e+09") ||
-      strcmp (fast_ftoa (295000000.0, 2, line), "3e+08") ||
-      strcmp (fast_ftoa (-531790.812, 9, line), "-531790.812")) {
+  if (fast_ftoa (fast_strtof ("nan", NULL), PREC_FLT_NR, line) != 3 ||
+      fast_ftoa (fast_strtof ("nan", NULL), PREC_FLT_NR, line) != 3 ||
+      fast_ftoa (0, PREC_FLT_NR, line) != 1 ||
+      fast_ftoa (1, 3, line) != 1 ||
+      strcmp (line, "1") ||
+      fast_ftoa (100, 4, line) != 3 ||
+      strcmp (line, "100") ||
+      fast_ftoa (965447232.0, 1, line) != 5 ||
+      strcmp (line, "1e+09") ||
+      fast_ftoa (295000000.0, 2, line) != 5 ||
+      strcmp (line, "3e+08") ||
+      fast_ftoa (-531790.812, 9, line) != 11 ||
+      strcmp (line, "-531790.812")) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (dtst) / sizeof (dtst[0]); i++) {
@@ -445,14 +455,23 @@ main (int argc, char **argv)
       printf ("fast_dtoa: failed 0x%016" PRIx64 " %s\n", dtst[i], line);
     }
   }
-  if (strcmp (fast_dtoa (1, PREC_DBL_NR + 1, line), "1") ||
-      strcmp (fast_dtoa (1, -1, line), "1")) {
+  if (fast_dtoa (1, PREC_DBL_NR + 1, line) != 1 ||
+      strcmp (line, "1") ||
+      fast_dtoa (1, -1, line) != 1 ||
+      strcmp (line, "1")) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
-  if (strcmp (fast_dtoa (1, 3, line), "1") ||
-      strcmp (fast_dtoa (100, 4, line), "100") ||
-      strcmp (fast_dtoa (107696295750000, 10, line), "1.076962958e+14") ||
-      strcmp (fast_dtoa (9.5202756046990724e-14, 1, line), "1e-13")) {
+  if (fast_dtoa (fast_strtod ("nan", NULL), PREC_DBL_NR, line) != 3 ||
+      fast_dtoa (fast_strtod ("nan", NULL), PREC_DBL_NR, line) != 3 ||
+      fast_dtoa (0, PREC_DBL_NR, line) != 1 ||
+      fast_dtoa (1, 3, line) != 1 ||
+      strcmp (line, "1") ||
+      fast_dtoa (100, 4, line) != 3 ||
+      strcmp (line, "100") ||
+      fast_dtoa (107696295750000, 10, line) != 15 ||
+      strcmp (line, "1.076962958e+14") ||
+      fast_dtoa (9.5202756046990724e-14, 1, line) != 5 ||
+      strcmp (line, "1e-13")) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {

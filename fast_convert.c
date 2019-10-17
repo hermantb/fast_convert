@@ -4889,10 +4889,10 @@ fast_strtou64 (const char *str, char **endptr)
  * \param v float value
  * \param size precision
  * \param line pointer to result
- * \returns line
+ * \returns lenght string
  */
 
-char *
+unsigned int
 fast_ftoa (float v, int size, char *line)
 {
   uint32_t q;
@@ -4925,7 +4925,7 @@ fast_ftoa (float v, int size, char *line)
     else {
       strcpy (s, "nan");
     }
-    return line;
+    return (s + 3) - line;
   }
   else if (LIKELY (exp)) {
     exp += 25;
@@ -4933,7 +4933,7 @@ fast_ftoa (float v, int size, char *line)
   else {
     if (UNLIKELY ((f.u & 0x007FFFFF) == 0)) {
       strcpy (s, "0");
-      return line;
+      return (s + 1) - line;
     }
     f.f *= 33554432.0;		/* 2^25 */
     exp = (int) ((f.u >> 23) & 0xFF);
@@ -5077,7 +5077,7 @@ fast_ftoa (float v, int size, char *line)
     }
   }
   *s = '\0';
-  return line;
+  return s - line;
 }
 
 /** \brief fast_dtoa
@@ -5089,10 +5089,10 @@ fast_ftoa (float v, int size, char *line)
  * \param v float value
  * \param size precision
  * \param line pointer to result
- * \returns line
+ * \returns lenght string
  */
 
-char *
+unsigned int
 fast_dtoa (double v, int size, char *line)
 {
   uint64_t q;
@@ -5124,7 +5124,7 @@ fast_dtoa (double v, int size, char *line)
     else {
       strcpy (s, "nan");
     }
-    return line;
+    return (s + 3) - line;
   }
   else if (LIKELY (exp)) {
     exp += 54;
@@ -5132,7 +5132,7 @@ fast_dtoa (double v, int size, char *line)
   else {
     if (UNLIKELY ((d.u & UINT64_C (0x000FFFFFFFFFFFFF)) == 0)) {
       strcpy (s, "0");
-      return line;
+      return (s + 1) - line;
     }
     d.d *= 18014398509481984.0;	/* 2^54 */
     exp = (int) ((d.u >> 52) & 0x7FF);
@@ -5282,7 +5282,7 @@ fast_dtoa (double v, int size, char *line)
     }
   }
   *s = '\0';
-  return line;
+  return s - line;
 }
 
 /** \brief fast_strtof

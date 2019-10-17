@@ -33,8 +33,8 @@ int64_t fast_strtos64 (const char *str, char **endptr);
 uint32_t fast_strtou32 (const char *str, char **endptr);
 uint64_t fast_strtou64 (const char *str, char **endptr);
 
-char *fast_ftoa (float v, int size, char *line);
-char *fast_dtoa (double v, int size, char *line);
+unsigned int fast_ftoa (float v, int size, char *line);
+unsigned int fast_dtoa (double v, int size, char *line);
 float fast_strtof (const char *str, char **endptr);
 double fast_strtod (const char *str, char **endptr);
 </pre>

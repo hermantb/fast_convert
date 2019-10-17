@@ -18,7 +18,8 @@ tst_convert32: fast_convert.h fast_convert.c tst_convert.c
 libfast_convert.a: fast_convert.h fast_convert.c
 	${CC} ${OPTIONS} -c fast_convert.c
 	rm -f libfast_convert.a
-	ar rv libfast_convert.a fast_convert.o
+	ar rc libfast_convert.a fast_convert.o
+	which ranlib >/dev/null 2>&1 && ranlib libfast_convert.a
 	rm -f fast_convert.o
 
 libfast_convert.so: fast_convert.h fast_convert.c

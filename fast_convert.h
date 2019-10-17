@@ -128,9 +128,9 @@ extern "C"
  * \param v float value
  * \param size precision
  * \param line pointer to result
- * \returns line
+ * \returns lenght string
  */
-  extern char *fast_ftoa (float v, int size, char *line);
+  extern unsigned int fast_ftoa (float v, int size, char *line);
 
 /** \brief fast_dtoa
  * 
@@ -141,9 +141,9 @@ extern "C"
  * \param v float value
  * \param size precision
  * \param line pointer to result
- * \returns line
+ * \returns lenght string
  */
-  extern char *fast_dtoa (double v, int size, char *line);
+  extern unsigned int fast_dtoa (double v, int size, char *line);
 
 /** \brief fast_strtof
  * 
