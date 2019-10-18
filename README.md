@@ -14,7 +14,6 @@ Some remarks:
 
  * All floating point routines have the same binary result as the glibc code (see [tst_convert.c](tst_convert.c)).
  * When ROUND\_EVEN == 1 the strings produced by fast\_ftoa and fast\_dtoa are the same as sprintf.
- * The integer functions have for example no base parameter to speed up the code.
  * The integer functions  will never overflow but instead return the last character that would cause the overflow in endptr.
  * No checking is done on size of supplied strings.
 
@@ -28,10 +27,10 @@ unsigned int fast_sint64 (int64_t v, char *str);
 unsigned int fast_uint32 (uint32_t v, char *str);
 unsigned int fast_uint64 (uint64_t v, char *str);
 
-int32_t fast_strtos32 (const char *str, char **endptr);
-int64_t fast_strtos64 (const char *str, char **endptr);
-uint32_t fast_strtou32 (const char *str, char **endptr);
-uint64_t fast_strtou64 (const char *str, char **endptr);
+int32_t fast_strtos32 (const char *str, char **endptr, int base);
+int64_t fast_strtos64 (const char *str, char **endptr, int base);
+uint32_t fast_strtou32 (const char *str, char **endptr, int base);
+uint64_t fast_strtou64 (const char *str, char **endptr, int base);
 
 unsigned int fast_ftoa (float v, int size, char *line);
 unsigned int fast_dtoa (double v, int size, char *line);
@@ -50,10 +49,10 @@ int sprintf (str, "%ld", v);
 int sprintf (str, "%u", v);
 int sprintf (str, "%lu", v);
 
-long int strtol(const char *nptr, &endptr, 0);
-long long int strtoll(const char *nptr, &endptr, 0);
-unsigned long int strtoul(const char *nptr, &endptr, 0);
-unsigned long long int strtoul(const char *nptr, &endptr, 0);
+long int strtol(const char *nptr, &endptr, int base);
+long long int strtoll(const char *nptr, &endptr, int base);
+unsigned long int strtoul(const char *nptr, &endptr, int base);
+unsigned long long int strtoul(const char *nptr, &endptr, int base);
 
 int sprintf (line, "%.*g", size, v); // v = float
 int sprintf (line, "%.*g", size, v); // v = double

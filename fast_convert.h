@@ -79,9 +79,10 @@ extern "C"
  *
  * \param str String to convert from
  * \param endptr optional endptr
+ * \param base base of converting.
  * \returns converted string
  */
-  extern int32_t fast_strtos32 (const char *str, char **endptr);
+  extern int32_t fast_strtos32 (const char *str, char **endptr, int base);
 
 /** \brief fast_strtos64
  * 
@@ -91,9 +92,10 @@ extern "C"
  *
  * \param str String to convert from
  * \param endptr optional endptr
+ * \param base base of converting.
  * \returns converted string
  */
-  extern int64_t fast_strtos64 (const char *str, char **endptr);
+  extern int64_t fast_strtos64 (const char *str, char **endptr, int base);
 
 /** \brief fast_strtou32
  * 
@@ -103,9 +105,10 @@ extern "C"
  *
  * \param str String to convert from
  * \param endptr optional endptr
+ * \param base base of converting.
  * \returns converted string
  */
-  extern uint32_t fast_strtou32 (const char *str, char **endptr);
+  extern uint32_t fast_strtou32 (const char *str, char **endptr, int base);
 
 /** \brief fast_strtou64
  * 
@@ -115,9 +118,10 @@ extern "C"
  *
  * \param str String to convert from
  * \param endptr optional endptr
+ * \param base base of converting.
  * \returns converted string
  */
-  extern uint64_t fast_strtou64 (const char *str, char **endptr);
+  extern uint64_t fast_strtou64 (const char *str, char **endptr, int base);
 
 /** \brief fast_ftoa
  * 

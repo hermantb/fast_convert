@@ -217,9 +217,10 @@ main (int argc, char **argv)
     }
   }
   for (i = 0; i < sizeof (sitst) / sizeof (sitst[0]); i++) {
-    if (fast_strtos32 (sitst[i].r, &endptr) != sitst[i].v || *endptr != '\0') {
+    if (fast_strtos32 (sitst[i].r, &endptr, 0) != sitst[i].v ||
+	*endptr != '\0') {
       printf ("fast_strtos32: conversion failed for %d %d\n", sitst[i].v,
-	      fast_strtos32 (sitst[i].r, &endptr));
+	      fast_strtos32 (sitst[i].r, &endptr, 0));
     }
     if (sitst[i].v < 0) {
       sprintf (line, "-0x%x", -sitst[i].v);
@@ -227,9 +228,9 @@ main (int argc, char **argv)
     else {
       sprintf (line, "0x%x", sitst[i].v);
     }
-    if (fast_strtos32 (line, &endptr) != sitst[i].v || *endptr != '\0') {
+    if (fast_strtos32 (line, &endptr, 0) != sitst[i].v || *endptr != '\0') {
       printf ("fast_strtos32: conversion failed for %d %d\n", sitst[i].v,
-	      fast_strtos32 (line, &endptr));
+	      fast_strtos32 (line, &endptr, 0));
     }
     if (sitst[i].v < 0) {
       sprintf (line, "-0X%X", -sitst[i].v);
@@ -237,9 +238,9 @@ main (int argc, char **argv)
     else {
       sprintf (line, " +0X%X", sitst[i].v);
     }
-    if (fast_strtos32 (line, &endptr) != sitst[i].v || *endptr != '\0') {
+    if (fast_strtos32 (line, &endptr, 0) != sitst[i].v || *endptr != '\0') {
       printf ("fast_strtos32: conversion failed for %d %d\n", sitst[i].v,
-	      fast_strtos32 (line, &endptr));
+	      fast_strtos32 (line, &endptr, 0));
     }
     if (sitst[i].v < 0) {
       sprintf (line, "-0%o", -sitst[i].v);
@@ -247,80 +248,152 @@ main (int argc, char **argv)
     else {
       sprintf (line, "0%o", sitst[i].v);
     }
-    if (fast_strtos32 (line, &endptr) != sitst[i].v || *endptr != '\0') {
+    if (fast_strtos32 (line, &endptr, 0) != sitst[i].v || *endptr != '\0') {
       printf ("fast_strtos32: conversion failed for %d %d\n", sitst[i].v,
-	      fast_strtos32 (line, &endptr));
+	      fast_strtos32 (line, &endptr, 0));
     }
   }
-  fast_strtos32 ("error", &endptr);
+  fast_strtos32 ("error", &endptr, 0);
   if (strcmp (endptr, "error")) {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("0x7fffffff0", &endptr);
+  fast_strtos32 ("0x7fffffff0", &endptr, 0);
   if (*endptr != '0') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("-0x80000001", &endptr);
+  fast_strtos32 ("-0x80000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("0177777777770", &endptr);
+  fast_strtos32 ("0177777777770", &endptr, 0);
   if (*endptr != '0') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("-020000000001", &endptr);
+  fast_strtos32 ("-020000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("2147483648", &endptr);
+  fast_strtos32 ("2147483648", &endptr, 0);
   if (*endptr != '8') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
-  fast_strtos32 ("-2147483649", &endptr);
+  fast_strtos32 ("-2147483649", &endptr, 0);
   if (*endptr != '9') {
     printf ("fast_strtos32: failed endptr %s\n", endptr);
   }
+  if (fast_strtos32 ("5478773671", &endptr, 9) != 2147483647 ||
+      *endptr != '\0') {
+    printf ("fast_strtos32: conversion failed for 5478773671 %d\n",
+	    fast_strtos32 ("5478773671", &endptr, 9));
+  }
+  if (fast_strtos32 ("1dB1f927", &endptr, 20) != 0x7fffffff ||
+      *endptr != '\0') {
+    printf ("fast_strtos32: conversion failed for 1dB1f927 %d\n",
+	    fast_strtos32 ("1dB1f927", &endptr, 20));
+  }
+  fast_strtos32 ("5478773672", &endptr, 9);
+  if (*endptr != '2') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
+  fast_strtos32 ("1dB1f928", &endptr, 20);
+  if (*endptr != '8') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
+  if (fast_strtos32 ("-5478773672", &endptr, 9) != -2147483648 ||
+      *endptr != '\0') {
+    printf ("fast_strtos32: conversion failed for -5478773672 %d\n",
+	    fast_strtos32 ("-5478773672", &endptr, 9));
+  }
+  if (fast_strtos32 ("-1dB1f928", &endptr, 20) != -0x80000000 ||
+      *endptr != '\0') {
+    printf ("fast_strtos32: conversion failed for -1dB1f928 %d\n",
+	    fast_strtos32 ("-1dB1f928", &endptr, 9));
+  }
+  fast_strtos32 ("-5478773673", &endptr, 9);
+  if (*endptr != '3') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
+  fast_strtos32 ("-1dB1f929", &endptr, 20);
+  if (*endptr != '9') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
+  fast_strtos32 ("12345", &endptr, 5);
+  if (*endptr != '5') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
+  fast_strtos32 ("09ghijk", &endptr, 20);
+  if (*endptr != 'k') {
+    printf ("fast_strtos32: failed endptr %s\n", endptr);
+  }
   for (i = 0; i < sizeof (uitst) / sizeof (uitst[0]); i++) {
-    if (fast_strtou32 (uitst[i].r, &endptr) != uitst[i].v || *endptr != '\0') {
+    if (fast_strtou32 (uitst[i].r, &endptr, 0) != uitst[i].v ||
+	*endptr != '\0') {
       printf ("fast_strtou32: conversion failed for %u %u\n", uitst[i].v,
-	      fast_strtou32 (uitst[i].r, &endptr));
+	      fast_strtou32 (uitst[i].r, &endptr, 0));
     }
     sprintf (line, "0x%x", uitst[i].v);
-    if (fast_strtou32 (line, &endptr) != uitst[i].v || *endptr != '\0') {
+    if (fast_strtou32 (line, &endptr, 0) != uitst[i].v || *endptr != '\0') {
       printf ("fast_strtou32: conversion failed for %u %u\n", uitst[i].v,
-	      fast_strtou32 (line, &endptr));
+	      fast_strtou32 (line, &endptr, 0));
     }
     sprintf (line, " 0X%X", uitst[i].v);
-    if (fast_strtou32 (line, &endptr) != uitst[i].v || *endptr != '\0') {
+    if (fast_strtou32 (line, &endptr, 0) != uitst[i].v || *endptr != '\0') {
       printf ("fast_strtou32: conversion failed for %u %u\n", uitst[i].v,
-	      fast_strtou32 (line, &endptr));
+	      fast_strtou32 (line, &endptr, 0));
     }
     sprintf (line, "0%o", uitst[i].v);
-    if (fast_strtou32 (line, &endptr) != uitst[i].v || *endptr != '\0') {
+    if (fast_strtou32 (line, &endptr, 0) != uitst[i].v || *endptr != '\0') {
       printf ("fast_strtou32: conversion failed for %u %u\n", uitst[i].v,
-	      fast_strtou32 (line, &endptr));
+	      fast_strtou32 (line, &endptr, 0));
     }
   }
-  fast_strtou32 ("error", &endptr);
+  fast_strtou32 ("error", &endptr, 0);
   if (strcmp (endptr, "error")) {
     printf ("fast_strtou32: failed endptr %s\n", endptr);
   }
-  fast_strtou32 ("0x100000001", &endptr);
+  fast_strtou32 ("0x100000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtou32: failed endptr %s\n", endptr);
   }
-  fast_strtou32 ("040000000001", &endptr);
+  fast_strtou32 ("040000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtou32: failed endptr %s\n", endptr);
   }
-  fast_strtou32 ("4294967297", &endptr);
+  fast_strtou32 ("4294967297", &endptr, 0);
   if (*endptr != '7') {
     printf ("fast_strtou32: failed endptr %s\n", endptr);
   }
+  if (fast_strtou32 ("12068657453", &endptr, 9) != 4294967295u ||
+      *endptr != '\0') {
+    printf ("fast_strtou32: conversion failed for 12068657453 %u\n",
+	    fast_strtou32 ("12068657453", &endptr, 9));
+  }
+  if (fast_strtou32 ("3723ai4F", &endptr, 20) != 0xffffffffu ||
+      *endptr != '\0') {
+    printf ("fast_strtou32: conversion failed for 3723ai4F %u\n",
+	    fast_strtou32 ("3723ai4F", &endptr, 20));
+  }
+  fast_strtou32 ("12068657454", &endptr, 9);
+  if (*endptr != '4') {
+    printf ("fast_strtou32: failed endptr %s\n", endptr);
+  }
+  fast_strtou32 ("3723ai4G", &endptr, 20);
+  if (*endptr != 'G') {
+    printf ("fast_strtou32: failed endptr %s\n", endptr);
+  }
+  fast_strtou32 ("12345", &endptr, 5);
+  if (*endptr != '5') {
+    printf ("fast_strtou32: failed endptr %s\n", endptr);
+  }
+  fast_strtou32 ("09ghijk", &endptr, 20);
+  if (*endptr != 'k') {
+    printf ("fast_strtou32: failed endptr %s\n", endptr);
+  }
   for (i = 0; i < sizeof (sltst) / sizeof (sltst[0]); i++) {
-    if (fast_strtos64 (sltst[i].r, &endptr) != sltst[i].v || *endptr != '\0') {
+    if (fast_strtos64 (sltst[i].r, &endptr, 0) != sltst[i].v ||
+	*endptr != '\0') {
       printf ("fast_strtos64: conversion failed for %" PRId64 " %" PRId64
-	      "\n", sltst[i].v, fast_strtos64 (sltst[i].r, &endptr));
+	      "\n", sltst[i].v, fast_strtos64 (sltst[i].r, &endptr, 0));
     }
     if (sltst[i].v < 0) {
       sprintf (line, "-0x%" PRIx64, -sltst[i].v);
@@ -328,9 +401,9 @@ main (int argc, char **argv)
     else {
       sprintf (line, "0x%" PRIx64, sltst[i].v);
     }
-    if (fast_strtos64 (line, &endptr) != sltst[i].v || *endptr != '\0') {
+    if (fast_strtos64 (line, &endptr, 0) != sltst[i].v || *endptr != '\0') {
       printf ("fast_strtos64: conversion failed for %" PRId64 " %" PRId64
-	      "\n", sltst[i].v, fast_strtos64 (line, &endptr));
+	      "\n", sltst[i].v, fast_strtos64 (line, &endptr, 0));
     }
     if (sltst[i].v < 0) {
       sprintf (line, "-0X%" PRIX64, -sltst[i].v);
@@ -338,9 +411,9 @@ main (int argc, char **argv)
     else {
       sprintf (line, " +0X%" PRIX64, sltst[i].v);
     }
-    if (fast_strtos64 (line, &endptr) != sltst[i].v || *endptr != '\0') {
+    if (fast_strtos64 (line, &endptr, 0) != sltst[i].v || *endptr != '\0') {
       printf ("fast_strtos64: conversion failed for %" PRId64 " %" PRId64
-	      "\n", sltst[i].v, fast_strtos64 (line, &endptr));
+	      "\n", sltst[i].v, fast_strtos64 (line, &endptr, 0));
     }
     if (sltst[i].v < 0) {
       sprintf (line, "-0%" PRIo64, -sltst[i].v);
@@ -348,74 +421,145 @@ main (int argc, char **argv)
     else {
       sprintf (line, "0%" PRIo64, sltst[i].v);
     }
-    if (fast_strtos64 (line, &endptr) != sltst[i].v || *endptr != '\0') {
+    if (fast_strtos64 (line, &endptr, 0) != sltst[i].v || *endptr != '\0') {
       printf ("fast_strtos64: conversion failed for %" PRId64 " %" PRId64
-	      "\n", sltst[i].v, fast_strtos64 (line, &endptr));
+	      "\n", sltst[i].v, fast_strtos64 (line, &endptr, 0));
     }
   }
-  fast_strtos64 ("error", &endptr);
+  fast_strtos64 ("error", &endptr, 0);
   if (strcmp (endptr, "error")) {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("0x7FFFFFFFFFFFFFFF0", &endptr);
+  fast_strtos64 ("0x7FFFFFFFFFFFFFFF0", &endptr, 0);
   if (*endptr != '0') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("-0x80000000000000001", &endptr);
+  fast_strtos64 ("-0x80000000000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("07777777777777777777770", &endptr);
+  fast_strtos64 ("07777777777777777777770", &endptr, 0);
   if (*endptr != '0') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("-01000000000000000000001", &endptr);
+  fast_strtos64 ("-01000000000000000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("9223372036854775808", &endptr);
+  fast_strtos64 ("9223372036854775808", &endptr, 0);
   if (*endptr != '8') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
-  fast_strtos64 ("-9223372036854775809", &endptr);
+  fast_strtos64 ("-9223372036854775809", &endptr, 0);
   if (*endptr != '9') {
     printf ("fast_strtos64: failed endptr %s\n", endptr);
   }
+  if (fast_strtos64 ("67404283172107811827", &endptr, 9) !=
+      INT64_C (9223372036854775807) || *endptr != '\0') {
+    printf ("fast_strtos64: conversion failed for 67404283172107811827 %"
+	    PRId64 "\n", fast_strtos64 ("67404283172107811827", &endptr, 9));
+  }
+  if (fast_strtos64 ("5CBFJia3fh26ja7", &endptr, 20) !=
+      INT64_C (0x7fffffffffffffff) || *endptr != '\0') {
+    printf ("fast_strtos64: conversion failed for 5CBFJia3fh26ja7 %" PRId64
+	    "\n", fast_strtos64 ("5CBFJia3fh26ja7", &endptr, 20));
+  }
+  fast_strtos64 ("67404283172107811828", &endptr, 9);
+  if (*endptr != '8') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
+  fast_strtos64 ("5CBFJia3fh26ja8", &endptr, 20);
+  if (*endptr != '8') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
+  if (fast_strtos64 ("-67404283172107811828", &endptr, 9) !=
+      INT64_C (-9223372036854775807) - 1 || *endptr != '\0') {
+    printf ("fast_strtos64: conversion failed for -67404283172107811828 %"
+	    PRId64 "\n", fast_strtos64 ("-67404283172107811828", &endptr, 9));
+  }
+  if (fast_strtos64 ("-5CBFJia3fh26ja8", &endptr, 20) !=
+      INT64_C (-0x8000000000000000) || *endptr != '\0') {
+    printf ("fast_strtos64: conversion failed for -5CBFJia3fh26ja8 %"
+	    PRId64 "\n", fast_strtos64 ("-5CBFJia3fh26ja8", &endptr, 20));
+  }
+  fast_strtos64 ("-67404283172107811830", &endptr, 9);
+  if (*endptr != '0') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
+  fast_strtos64 ("-5CBFJia3fh26ja9", &endptr, 20);
+  if (*endptr != '9') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
+  fast_strtos64 ("12345", &endptr, 5);
+  if (*endptr != '5') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
+  fast_strtos64 ("0189abchijk", &endptr, 20);
+  if (*endptr != 'k') {
+    printf ("fast_strtos64: failed endptr %s\n", endptr);
+  }
   for (i = 0; i < sizeof (ultst) / sizeof (ultst[0]); i++) {
-    if (fast_strtou64 (ultst[i].r, &endptr) != ultst[i].v || *endptr != '\0') {
+    if (fast_strtou64 (ultst[i].r, &endptr, 0) != ultst[i].v ||
+	*endptr != '\0') {
       printf ("fast_strtou64: conversion failed for %" PRIu64 " %" PRIu64
-	      "\n", ultst[i].v, fast_strtou64 (ultst[i].r, &endptr));
+	      "\n", ultst[i].v, fast_strtou64 (ultst[i].r, &endptr, 0));
     }
     sprintf (line, "0x%" PRIx64, ultst[i].v);
-    if (fast_strtou64 (line, &endptr) != ultst[i].v || *endptr != '\0') {
+    if (fast_strtou64 (line, &endptr, 0) != ultst[i].v || *endptr != '\0') {
       printf ("fast_strtou64: conversion failed for %" PRIu64 " %" PRIu64
-	      "\n", ultst[i].v, fast_strtou64 (line, &endptr));
+	      "\n", ultst[i].v, fast_strtou64 (line, &endptr, 0));
     }
     sprintf (line, " 0X%" PRIX64, ultst[i].v);
-    if (fast_strtou64 (line, &endptr) != ultst[i].v || *endptr != '\0') {
+    if (fast_strtou64 (line, &endptr, 0) != ultst[i].v || *endptr != '\0') {
       printf ("fast_strtou64: conversion failed for %" PRIu64 " %" PRIu64
-	      "\n", ultst[i].v, fast_strtou64 (line, &endptr));
+	      "\n", ultst[i].v, fast_strtou64 (line, &endptr, 0));
     }
     sprintf (line, "0%" PRIo64, ultst[i].v);
-    if (fast_strtou64 (line, &endptr) != ultst[i].v || *endptr != '\0') {
+    if (fast_strtou64 (line, &endptr, 0) != ultst[i].v || *endptr != '\0') {
       printf ("fast_strtou64: conversion failed for %" PRIu64 " %" PRIu64
-	      "\n", ultst[i].v, fast_strtou64 (line, &endptr));
+	      "\n", ultst[i].v, fast_strtou64 (line, &endptr, 0));
     }
   }
-  fast_strtou64 ("error", &endptr);
+  fast_strtou64 ("error", &endptr, 0);
   if (strcmp (endptr, "error")) {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
-  fast_strtou64 ("0x10000000000000001", &endptr);
+  fast_strtou64 ("0x10000000000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
-  fast_strtou64 ("02000000000000000000001", &endptr);
+  fast_strtou64 ("02000000000000000000001", &endptr, 0);
   if (*endptr != '1') {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
-  fast_strtou64 ("18446744073709551617", &endptr);
+  fast_strtou64 ("18446744073709551617", &endptr, 0);
   if (*endptr != '7') {
+    printf ("fast_strtou64: failed endptr %s\n", endptr);
+  }
+  if (fast_strtou64 ("145808576354216723756", &endptr, 9) !=
+      UINT64_C (18446744073709551615) || *endptr != '\0') {
+    printf ("fast_strtou64: conversion failed for 145808576354216723756 %"
+	    PRIu64 "\n", fast_strtou64 ("145808576354216723756", &endptr, 9));
+  }
+  if (fast_strtou64 ("B53BJH07BE4dj0f", &endptr, 20) !=
+      UINT64_C (0xffffffffffffffff) || *endptr != '\0') {
+    printf ("fast_strtou64: conversion failed for B53BJH07BE4dj0f %" PRIu64
+	    "\n", fast_strtou64 ("B53BJH07BE4dj0f", &endptr, 20));
+  }
+  fast_strtou64 ("145808576354216723757", &endptr, 9);
+  if (*endptr != '7') {
+    printf ("fast_strtou64: failed endptr %s\n", endptr);
+  }
+  fast_strtou64 ("B53BJH07BE4dj0h", &endptr, 20);
+  if (*endptr != 'h') {
+    printf ("fast_strtou64: failed endptr %s\n", endptr);
+  }
+  fast_strtou64 ("12345", &endptr, 5);
+  if (*endptr != '5') {
+    printf ("fast_strtou64: failed endptr %s\n", endptr);
+  }
+  fast_strtou64 ("0189abchijk", &endptr, 20);
+  if (*endptr != 'k') {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {
@@ -428,8 +572,7 @@ main (int argc, char **argv)
   }
   if (fast_ftoa (1, PREC_FLT_NR + 1, line) != 1 ||
       strcmp (line, "1") ||
-      fast_ftoa (1, -1, line) != 1 ||
-      strcmp (line, "1")) {
+      fast_ftoa (1, -1, line) != 1 || strcmp (line, "1")) {
     printf ("fast_ftoa: size failed: %s\n", line);
   }
   if (fast_ftoa (fast_strtof ("nan", NULL), PREC_FLT_NR, line) != 3 ||
@@ -457,8 +600,7 @@ main (int argc, char **argv)
   }
   if (fast_dtoa (1, PREC_DBL_NR + 1, line) != 1 ||
       strcmp (line, "1") ||
-      fast_dtoa (1, -1, line) != 1 ||
-      strcmp (line, "1")) {
+      fast_dtoa (1, -1, line) != 1 || strcmp (line, "1")) {
     printf ("fast_dtoa: size failed: %s\n", line);
   }
   if (fast_dtoa (fast_strtod ("nan", NULL), PREC_DBL_NR, line) != 3 ||
