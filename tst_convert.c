@@ -19,6 +19,11 @@
 #define RAND_IA         UINT64_C(0x5851F42D4C957F2D)
 #define RAND_IC         UINT64_C(0x14057B7EF767814F)
 
+#define N       	(1<<20)
+#define M       	(N - 1)
+
+static char str[N][70];
+
 static double
 get_time (void)
 {
@@ -33,6 +38,54 @@ get_time (void)
   clock_gettime (CLOCK_REALTIME, &curtime);
   return ((double) curtime.tv_sec) * 1e9 + ((double) curtime.tv_nsec);
 #endif
+}
+
+static uint64_t
+init (uint64_t r, unsigned int sign, unsigned int size, unsigned int base,
+      unsigned int prefix)
+{
+  unsigned int i;
+
+  for (i = 0; i < N; i++) {
+    unsigned int t;
+    uint64_t v;
+    uint64_t m = UINT64_C (1) << (size - 1);
+    char tmp[70];
+    char *cp;
+
+    r = r * RAND_IA + RAND_IC;
+    v = (r >> 16) & UINT64_C (0xFFFFFFFF);
+    if (size == 64) {
+      r = r * RAND_IA + RAND_IC;
+      v |= ((r >> 16) & UINT64_C (0xFFFFFFFF)) << 32;
+    }
+    cp = &tmp[sizeof (tmp) - 1];
+    *cp = '\0';
+    t = 0;
+    if (sign && (v & m)) {
+      t = 1;
+      v = ~v + 1;
+      if (size == 32) {
+	v &= UINT64_C (0xFFFFFFFF);
+      }
+    }
+    do {
+      *--cp = "0123456789aBcDeFgHiJkLmNoPqRsTuVwXyZ"[v % base];
+      v /= base;
+    } while (v);
+    if (prefix && base == 8) {
+      *--cp = '0';
+    }
+    if (prefix && base == 16) {
+      *--cp = 'x';
+      *--cp = '0';
+    }
+    if (t) {
+      *--cp = '-';
+    }
+    strcpy (str[i], cp);
+  }
+  return r;
 }
 
 int
@@ -813,11 +866,131 @@ main (int argc, char **argv)
     printf ("  P test precision double\n");
     printf ("  c count differences float\n");
     printf ("  C count differences double\n");
+    printf ("  i test interger functions\n");
     printf ("  if option after first one is 'n' then no check is done\n");
     exit (1);
   }
   start = get_time ();
-  if (argv[1][0] == 'f' || argv[1][0] == 's') {
+  if (argv[1][0] == 'i') {
+    unsigned int b;
+    uint64_t rsave;
+    uint64_t n1;
+    uint64_t n2;
+    uint64_t count = 100000000;
+    int prefix[] = { 0, 0, 1, 0, 0, 0, 1, 0 };
+    int base[] = { 2, 8, 8, 10, 12, 16, 16, 36 };
+
+    n1 = 0;
+    n2 = 0;
+    rsave = r;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 1, 32, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n1 += fast_strtos32 (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("fast_strtos32(%2d%c): %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 1, 32, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n2 += strtol (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("strtol(%2d%c):        %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    if (n1 != n2) {
+      printf ("n1(%" PRIu64 ") != n2(%" PRIu64 ")\n", n1, n2);
+    }
+    n1 = 0;
+    n2 = 0;
+    rsave = r;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 1, 64, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n1 += fast_strtos64 (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("fast_strtos64(%2d%c): %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 1, 64, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n2 += strtoll (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("strtoll(%2d%c):       %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    if (n1 != n2) {
+      printf ("n1(%" PRIu64 ") != n2(%" PRIu64 ")\n", n1, n2);
+    }
+    n1 = 0;
+    n2 = 0;
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 0, 32, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n1 += fast_strtou32 (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("fast_strtus32(%2d%c): %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 0, 32, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n2 += strtoul (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("strtoul(%2d%c):       %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    if (n1 != n2) {
+      printf ("n1(%" PRIu64 ") != n2(%" PRIu64 ")\n", n1, n2);
+    }
+    n1 = 0;
+    n2 = 0;
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 0, 64, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n1 += fast_strtou64 (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("fast_strtou64(%2d%c): %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    r = rsave;
+    for (b = 0; b < sizeof (base) / sizeof (base[0]); b++) {
+      r = init (r, 0, 64, base[b], prefix[b]);
+      start = get_time ();
+      for (i = 0; i < count; i++) {
+	n2 += strtoull (str[i & M], NULL, base[b]);
+      }
+      end = get_time ();
+      printf ("strtoull(%2d%c):      %12.9f\n", base[b],
+	      prefix[b] ? 'p' : ' ', (end - start) / 1e9);
+    }
+    if (n1 != n2) {
+      printf ("n1(%" PRIu64 ") != n2(%" PRIu64 ")\n", n1, n2);
+    }
+    return 0;
+  }
+  else if (argv[1][0] == 'f' || argv[1][0] == 's') {
     for (i = 0; i <= max; i++) {
       tf.u = i;
       if (argv[1][0] == 'f') {

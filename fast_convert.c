@@ -3906,6 +3906,79 @@ static const char num3[3000] = {
   '9', '9', '5', '9', '9', '6', '9', '9', '7', '9', '9', '8', '9', '9', '9',
 };
 
+static uint32_t convert_num[128] = {
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 1, 2, 3, 4, 5, 6, 7,
+  8, 9, 0, 0, 0, 0, 0, 0,
+  0, 10, 11, 12, 13, 14, 15, 16,
+  17, 18, 19, 20, 21, 22, 23, 24,
+  25, 26, 27, 28, 29, 30, 31, 32,
+  33, 34, 35, 0, 0, 0, 0, 0,
+  0, 10, 11, 12, 13, 14, 15, 16,
+  17, 18, 19, 20, 21, 22, 23, 24,
+  25, 26, 27, 28, 29, 30, 31, 32,
+  33, 34, 35, 0, 0, 0, 0, 0,
+};
+
+static unsigned char uppercase[256] = {
+  0, 1, 2, 3, 4, 5, 6, 7,
+  8, 9, 10, 11, 12, 13, 14, 15,
+  16, 17, 18, 19, 20, 21, 22, 23,
+  24, 25, 26, 27, 28, 29, 30, 31,
+  32, 33, 34, 35, 36, 37, 38, 39,
+  40, 41, 42, 43, 44, 45, 46, 47,
+  48, 49, 50, 51, 52, 53, 54, 55,
+  56, 57, 58, 59, 60, 61, 62, 63,
+  64, 65, 66, 67, 68, 69, 70, 71,
+  72, 73, 74, 75, 76, 77, 78, 79,
+  80, 81, 82, 83, 84, 85, 86, 87,
+  88, 89, 90, 91, 92, 93, 94, 95,
+  96, 65, 66, 67, 68, 69, 70, 71,
+  72, 73, 74, 75, 76, 77, 78, 79,
+  80, 81, 82, 83, 84, 85, 86, 87,
+  88, 89, 90, 123, 124, 125, 126, 127,
+  128, 129, 130, 131, 132, 133, 134, 135,
+  136, 137, 138, 139, 140, 141, 142, 143,
+  144, 145, 146, 147, 148, 149, 150, 151,
+  152, 153, 154, 155, 156, 157, 158, 159,
+  160, 161, 162, 163, 164, 165, 166, 167,
+  168, 169, 170, 171, 172, 173, 174, 175,
+  176, 177, 178, 179, 180, 181, 182, 183,
+  184, 185, 186, 187, 188, 189, 190, 191,
+  192, 193, 194, 195, 196, 197, 198, 199,
+  200, 201, 202, 203, 204, 205, 206, 207,
+  208, 209, 210, 211, 212, 213, 214, 215,
+  216, 217, 218, 219, 220, 221, 222, 223,
+  224, 225, 226, 227, 228, 229, 230, 231,
+  232, 233, 234, 235, 236, 237, 238, 239,
+  240, 241, 242, 243, 244, 245, 246, 247,
+  248, 249, 250, 251, 252, 253, 254, 255
+};
+
+static uint32_t valid_num[256] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
 #define	DECIMAL_POINT	(*lconv->decimal_point)
 
 static struct lconv default_lconv = {.decimal_point = "." };
@@ -4568,7 +4641,43 @@ fast_strtos32 (const char *str, char **endptr, int base)
 {
   uint32_t n;
   unsigned int sign = 0;
-  char *cp = (char *) str;
+  unsigned char *cp = (unsigned char *) str;
+#define	M(x)	(2147483647u / (x))
+  static const uint32_t maxp[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	M(x)	(2147483648u / (x))
+  static const uint32_t maxn[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	R(x)	(2147483647u % (x))
+  static const uint32_t remp[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
+#define	R(x)	(2147483648u % (x))
+  static const uint32_t remn[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
 
   while (isspace (*cp)) {
     cp++;
@@ -4586,149 +4695,105 @@ fast_strtos32 (const char *str, char **endptr, int base)
       (base != 8 || *cp != '0' || cp[1] < '0' || cp[1] > '7') &&
       (base != 16 || *cp != '0' || (cp[1] != 'x' && cp[1] != 'X'))) {
     if (base >= 2 && base <= 36) {
-#define	M(x)	(2147483647u / (x))
-      static const uint32_t maxp[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	M(x)	(2147483648u / (x))
-      static const uint32_t maxn[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	R(x)	(2147483647u % (x))
-      static const uint32_t remp[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
-#define	R(x)	(2147483648u % (x))
-      static const uint32_t remn[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
       uint32_t max = sign ? maxn[base] : maxp[base];
       uint32_t rem = sign ? remn[base] : remp[base];
 
       if (base <= 10) {
-	if (*cp >= '0' && *cp < '0' + base) {
-	  do {
-	    uint32_t v = *cp - '0';
+	unsigned char u = *cp;
+	unsigned char end = '0' + base;
 
-	    if (n > max || (n == max && v > rem)) {
+	if (u >= '0' && u < end) {
+	  do {
+	    uint32_t v = convert_num[u];
+
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while (*cp >= '0' && *cp < '0' + base);
+	    u = *++cp;
+	  } while (u >= '0' && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
       else {
-	if ((*cp >= '0' && *cp <= '9') ||
-	    (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-	    (*cp >= 'A' && (*cp < 'A' + base - 10))) {
+	unsigned char u = uppercase[*cp];
+	unsigned char end = 'A' + base - 10;
+
+	if (valid_num[u] && u < end) {
 	  do {
-	    uint32_t v;
+	    uint32_t v = convert_num[u];
 
-	    if (*cp <= '9') {
-	      v = *cp - '0';
-	    }
-	    else if (*cp >= 'a') {
-	      v = *cp - 'a' + 10;
-	    }
-	    else {
-	      v = *cp - 'A' + 10;
-	    }
-
-	    if (n > max || (n == max && v > rem)) {
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while ((*cp >= '0' && *cp <= '9') ||
-		   (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-		   (*cp >= 'A' && (*cp < 'A' + base - 10)));
+	    u = uppercase[*++cp];
+	  } while (valid_num[u] && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
     }
     else {
-      cp = (char *) str;
+      cp = (unsigned char *) str;
     }
   }
   else if (*cp == '0') {
     cp++;
     if ((*cp == 'x' || *cp == 'X') && isxdigit (cp[1])) {
-      cp++;
-      do {
-	uint32_t v;
+      uint32_t max = sign ? maxn[16] : maxp[16];
+      uint32_t rem = sign ? remn[16] : remp[16];
+      unsigned char u = *++cp;
 
-	if (*cp <= '9') {
-	  v = *cp - '0';
-	}
-	else if (*cp >= 'a') {
-	  v = *cp - 'a' + 10;
-	}
-	else {
-	  v = *cp - 'A' + 10;
-	}
-	if (sign ? n > 0x8000000 || (n == 0x8000000 && v > 0)
-	    : n > 0x7FFFFFF) {
+      do {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 16 + v;
-	cp++;
-      } while (isxdigit (*cp));
+	u = *++cp;
+      } while (isxdigit (u));
     }
     else {
-      while (*cp >= '0' && *cp <= '7') {
-	uint32_t v = *cp - '0';
+      uint32_t max = sign ? maxn[8] : maxp[8];
+      uint32_t rem = sign ? remn[8] : remp[8];
+      unsigned char u = *cp;
 
-	if (sign ? n > 0x10000000 || (n == 0x10000000 && v > 0)
-	    : n > 0xFFFFFFF) {
+      while (u >= '0' && u <= '7') {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 8 + v;
-	cp++;
+	u = *++cp;
       }
     }
   }
   else if (isdigit (*cp)) {
-    do {
-      uint32_t v = *cp - '0';
+    uint32_t max = sign ? maxn[10] : maxp[10];
+    uint32_t rem = sign ? remn[10] : remp[10];
+    unsigned char u = *cp;
 
-      if (n > 214748364 || (n == 214748364 && v > (sign ? 8 : 7))) {
+    do {
+      uint32_t v = convert_num[u];
+
+      if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	break;
       }
       n = n * 10 + v;
-      cp++;
-    } while (isdigit (*cp));
+      u = *++cp;
+    } while (isdigit (u));
   }
   else {
-    cp = (char *) str;
+    cp = (unsigned char *) str;
   }
   if (endptr) {
-    *endptr = cp;
+    *endptr = (char *) cp;
   }
   return sign ? -(int32_t) n : (int32_t) n;
 }
@@ -4749,7 +4814,43 @@ fast_strtos64 (const char *str, char **endptr, int base)
 {
   uint64_t n;
   unsigned int sign = 0;
-  char *cp = (char *) str;
+  unsigned char *cp = (unsigned char *) str;
+#define	M(x)	(UINT64_C(9223372036854775807) / (x))
+  static const uint64_t maxp[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	M(x)	(UINT64_C(9223372036854775808) / (x))
+  static const uint64_t maxn[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	R(x)	(UINT64_C(9223372036854775807) % (x))
+  static const uint64_t remp[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
+#define	R(x)	(UINT64_C(9223372036854775808) % (x))
+  static const uint64_t remn[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
 
   while (isspace (*cp)) {
     cp++;
@@ -4767,152 +4868,105 @@ fast_strtos64 (const char *str, char **endptr, int base)
       (base != 8 || *cp != '0' || cp[1] < '0' || cp[1] > '7') &&
       (base != 16 || *cp != '0' || (cp[1] != 'x' && cp[1] != 'X'))) {
     if (base >= 2 && base <= 36) {
-#define	M(x)	(UINT64_C(9223372036854775807) / (x))
-      static const uint64_t maxp[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	M(x)	(UINT64_C(9223372036854775808) / (x))
-      static const uint64_t maxn[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	R(x)	(UINT64_C(9223372036854775807) % (x))
-      static const uint64_t remp[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
-#define	R(x)	(UINT64_C(9223372036854775808) % (x))
-      static const uint64_t remn[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
       uint64_t max = sign ? maxn[base] : maxp[base];
       uint64_t rem = sign ? remn[base] : remp[base];
 
       if (base <= 10) {
-	if (*cp >= '0' && *cp < '0' + base) {
-	  do {
-	    uint32_t v = *cp - '0';
+	unsigned char u = *cp;
+	unsigned char end = '0' + base;
 
-	    if (n > max || (n == max && v > rem)) {
+	if (u >= '0' && u < end) {
+	  do {
+	    uint32_t v = convert_num[u];
+
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while (*cp >= '0' && *cp < '0' + base);
+	    u = *++cp;
+	  } while (u >= '0' && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
       else {
-	if ((*cp >= '0' && *cp <= '9') ||
-	    (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-	    (*cp >= 'A' && (*cp < 'A' + base - 10))) {
+	unsigned char u = uppercase[*cp];
+	unsigned char end = 'A' + base - 10;
+
+	if (valid_num[u] && u < end) {
 	  do {
-	    uint32_t v;
+	    uint32_t v = convert_num[u];
 
-	    if (*cp <= '9') {
-	      v = *cp - '0';
-	    }
-	    else if (*cp >= 'a') {
-	      v = *cp - 'a' + 10;
-	    }
-	    else {
-	      v = *cp - 'A' + 10;
-	    }
-
-	    if (n > max || (n == max && v > rem)) {
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while ((*cp >= '0' && *cp <= '9') ||
-		   (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-		   (*cp >= 'A' && (*cp < 'A' + base - 10)));
+	    u = uppercase[*++cp];
+	  } while (valid_num[u] && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
     }
     else {
-      cp = (char *) str;
+      cp = (unsigned char *) str;
     }
   }
   else if (*cp == '0') {
     cp++;
     if ((*cp == 'x' || *cp == 'X') && isxdigit (cp[1])) {
-      cp++;
-      do {
-	uint32_t v;
+      uint64_t max = sign ? maxn[16] : maxp[16];
+      uint64_t rem = sign ? remn[16] : remp[16];
+      unsigned char u = *++cp;
 
-	if (*cp <= '9') {
-	  v = *cp - '0';
-	}
-	else if (*cp >= 'a') {
-	  v = *cp - 'a' + 10;
-	}
-	else {
-	  v = *cp - 'A' + 10;
-	}
-	if (sign ? n > UINT64_C (0x800000000000000) ||
-	    (n == UINT64_C (0x800000000000000) && v > 0)
-	    : n > UINT64_C (0x7FFFFFFFFFFFFFF)) {
+      do {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 16 + v;
-	cp++;
-      } while (isxdigit (*cp));
+	u = *++cp;
+      } while (isxdigit (u));
     }
     else {
-      while (*cp >= '0' && *cp <= '7') {
-	uint32_t v = *cp - '0';
+      uint64_t max = sign ? maxn[8] : maxp[8];
+      uint64_t rem = sign ? remn[8] : remp[8];
+      unsigned char u = *cp;
 
-	if (sign ? n > UINT64_C (0x1000000000000000) ||
-	    (n == UINT64_C (0x1000000000000000) && v > 0)
-	    : n > UINT64_C (0xFFFFFFFFFFFFFFF)) {
+      while (u >= '0' && u <= '7') {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 8 + v;
-	cp++;
+	u = *++cp;
       }
     }
   }
   else if (isdigit (*cp)) {
-    do {
-      uint32_t v = *cp - '0';
+    uint64_t max = sign ? maxn[10] : maxp[10];
+    uint64_t rem = sign ? remn[10] : remp[10];
+    unsigned char u = *cp;
 
-      if (n > UINT64_C (922337203685477580) ||
-	  (n == UINT64_C (922337203685477580) && v > (sign ? 8 : 7))) {
+    do {
+      uint32_t v = convert_num[u];
+
+      if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	break;
       }
       n = n * 10 + v;
-      cp++;
-    } while (isdigit (*cp));
+      u = *++cp;
+    } while (isdigit (u));
   }
   else {
-    cp = (char *) str;
+    cp = (unsigned char *) str;
   }
   if (endptr) {
-    *endptr = cp;
+    *endptr = (char *) cp;
   }
   return sign ? -(int64_t) n : (int64_t) n;
 }
@@ -4932,7 +4986,25 @@ uint32_t
 fast_strtou32 (const char *str, char **endptr, int base)
 {
   uint32_t n;
-  char *cp = (char *) str;
+  unsigned char *cp = (unsigned char *) str;
+#define	M(x)	(4294967295u / (x))
+  static const uint32_t maxp[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	R(x)	(4294967295u % (x))
+  static const uint32_t remp[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
 
   while (isspace (*cp)) {
     cp++;
@@ -4943,129 +5015,105 @@ fast_strtou32 (const char *str, char **endptr, int base)
       (base != 8 || *cp != '0' || cp[1] < '0' || cp[1] > '7') &&
       (base != 16 || *cp != '0' || (cp[1] != 'x' && cp[1] != 'X'))) {
     if (base >= 2 && base <= 36) {
-#define	M(x)	(4294967295u / (x))
-      static const uint32_t maxp[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	R(x)	(4294967295u % (x))
-      static const uint32_t remp[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
       uint32_t max = maxp[base];
       uint32_t rem = remp[base];
 
       if (base <= 10) {
-	if (*cp >= '0' && *cp < '0' + base) {
-	  do {
-	    uint32_t v = *cp - '0';
+	unsigned char u = *cp;
+	unsigned char end = '0' + base;
 
-	    if (n > max || (n == max && v > rem)) {
+	if (u >= '0' && u < end) {
+	  do {
+	    uint32_t v = convert_num[u];
+
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while (*cp >= '0' && *cp < '0' + base);
+	    u = *++cp;
+	  } while (u >= '0' && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
       else {
-	if ((*cp >= '0' && *cp <= '9') ||
-	    (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-	    (*cp >= 'A' && (*cp < 'A' + base - 10))) {
+	unsigned char u = uppercase[*cp];
+	unsigned char end = 'A' + base - 10;
+
+	if (valid_num[u] && u < end) {
 	  do {
-	    uint32_t v;
+	    uint32_t v = convert_num[u];
 
-	    if (*cp <= '9') {
-	      v = *cp - '0';
-	    }
-	    else if (*cp >= 'a') {
-	      v = *cp - 'a' + 10;
-	    }
-	    else {
-	      v = *cp - 'A' + 10;
-	    }
-
-	    if (n > max || (n == max && v > rem)) {
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while ((*cp >= '0' && *cp <= '9') ||
-		   (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-		   (*cp >= 'A' && (*cp < 'A' + base - 10)));
+	    u = uppercase[*++cp];
+	  } while (valid_num[u] && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
     }
     else {
-      cp = (char *) str;
+      cp = (unsigned char *) str;
     }
   }
   else if (*cp == '0') {
     cp++;
     if ((*cp == 'x' || *cp == 'X') && isxdigit (cp[1])) {
-      cp++;
-      do {
-	uint32_t v;
+      uint32_t max = maxp[16];
+      uint32_t rem = remp[16];
+      unsigned char u = *++cp;
 
-	if (*cp <= '9') {
-	  v = *cp - '0';
-	}
-	else if (*cp >= 'a') {
-	  v = *cp - 'a' + 10;
-	}
-	else {
-	  v = *cp - 'A' + 10;
-	}
-	if (n > 0xFFFFFFF) {
+      do {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 16 + v;
-	cp++;
-      } while (isxdigit (*cp));
+	u = *++cp;
+      } while (isxdigit (u));
     }
     else {
-      while (*cp >= '0' && *cp <= '7') {
-	uint32_t v = *cp - '0';
+      uint32_t max = maxp[8];
+      uint32_t rem = remp[8];
+      unsigned char u = *cp;
 
-	if (n > 0x1FFFFFFF) {
+      while (u >= '0' && u <= '7') {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 8 + v;
-	cp++;
+	u = *++cp;
       }
     }
   }
   else if (isdigit (*cp)) {
-    do {
-      uint32_t v = *cp - '0';
+    uint32_t max = maxp[10];
+    uint32_t rem = remp[10];
+    unsigned char u = *cp;
 
-      if (n > 429496729 || (n == 429496729 && v > 6)) {
+    do {
+      uint32_t v = convert_num[u];
+
+      if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	break;
       }
       n = n * 10 + v;
-      cp++;
-    } while (isdigit (*cp));
+      u = *++cp;
+    } while (isdigit (u));
   }
   else {
-    cp = (char *) str;
+    cp = (unsigned char *) str;
   }
   if (endptr) {
-    *endptr = cp;
+    *endptr = (char *) cp;
   }
   return n;
 }
@@ -5085,7 +5133,25 @@ uint64_t
 fast_strtou64 (const char *str, char **endptr, int base)
 {
   uint64_t n;
-  char *cp = (char *) str;
+  unsigned char *cp = (unsigned char *) str;
+#define	M(x)	(UINT64_C(18446744073709551615) / (x))
+  static const uint64_t maxp[37] = {
+    0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
+    M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
+    M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
+    M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
+    M (35), M (36)
+  };
+#undef M
+#define	R(x)	(UINT64_C(18446744073709551615) % (x))
+  static const uint64_t remp[37] = {
+    0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
+    R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
+    R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
+    R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
+    R (35), R (36)
+  };
+#undef R
 
   while (isspace (*cp)) {
     cp++;
@@ -5096,130 +5162,105 @@ fast_strtou64 (const char *str, char **endptr, int base)
       (base != 8 || *cp != '0' || cp[1] < '0' || cp[1] > '7') &&
       (base != 16 || *cp != '0' || (cp[1] != 'x' && cp[1] != 'X'))) {
     if (base >= 2 && base <= 36) {
-#define	M(x)	(UINT64_C(18446744073709551615) / (x))
-      static const uint64_t maxp[37] = {
-	0, 0, M (2), M (3), M (4), M (5), M (6), M (7), M (8), M (9), M (10),
-	M (11), M (12), M (13), M (14), M (15), M (16), M (17), M (18),
-	M (19), M (20), M (21), M (22), M (23), M (24), M (25), M (26),
-	M (27), M (28), M (29), M (30), M (31), M (32), M (33), M (34),
-	M (35), M (36)
-      };
-#undef M
-#define	R(x)	(UINT64_C(18446744073709551615) % (x))
-      static const uint64_t remp[37] = {
-	0, 0, R (2), R (3), R (4), R (5), R (6), R (7), R (8), R (9), R (10),
-	R (11), R (12), R (13), R (14), R (15), R (16), R (17), R (18),
-	R (19), R (20), R (21), R (22), R (23), R (24), R (25), R (26),
-	R (27), R (28), R (29), R (30), R (31), R (32), R (33), R (34),
-	R (35), R (36)
-      };
-#undef R
       uint64_t max = maxp[base];
       uint64_t rem = remp[base];
 
       if (base <= 10) {
-	if (*cp >= '0' && *cp < '0' + base) {
-	  do {
-	    uint32_t v = *cp - '0';
+	unsigned char u = *cp;
+	unsigned char end = '0' + base;
 
-	    if (n > max || (n == max && v > rem)) {
+	if (u >= '0' && u < end) {
+	  do {
+	    uint32_t v = convert_num[u];
+
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while (*cp >= '0' && *cp < '0' + base);
+	    u = *++cp;
+	  } while (u >= '0' && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
       else {
-	if ((*cp >= '0' && *cp <= '9') ||
-	    (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-	    (*cp >= 'A' && (*cp < 'A' + base - 10))) {
+	unsigned char u = uppercase[*cp];
+	unsigned char end = 'A' + base - 10;
+
+	if (valid_num[u] && u < end) {
 	  do {
-	    uint32_t v;
+	    uint32_t v = convert_num[u];
 
-	    if (*cp <= '9') {
-	      v = *cp - '0';
-	    }
-	    else if (*cp >= 'a') {
-	      v = *cp - 'a' + 10;
-	    }
-	    else {
-	      v = *cp - 'A' + 10;
-	    }
-
-	    if (n > max || (n == max && v > rem)) {
+	    if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	      break;
 	    }
 	    n = n * base + v;
-	    cp++;
-	  } while ((*cp >= '0' && *cp <= '9') ||
-		   (*cp >= 'a' && (*cp < 'a' + base - 10)) ||
-		   (*cp >= 'A' && (*cp < 'A' + base - 10)));
+	    u = uppercase[*++cp];
+	  } while (valid_num[u] && u < end);
 	}
 	else {
-	  cp = (char *) str;
+	  cp = (unsigned char *) str;
 	}
       }
     }
     else {
-      cp = (char *) str;
+      cp = (unsigned char *) str;
     }
   }
   else if (*cp == '0') {
     cp++;
     if ((*cp == 'x' || *cp == 'X') && isxdigit (cp[1])) {
-      cp++;
-      do {
-	uint32_t v;
+      uint64_t max = maxp[16];
+      uint64_t rem = remp[16];
+      unsigned char u = *++cp;
 
-	if (*cp <= '9') {
-	  v = *cp - '0';
-	}
-	else if (*cp >= 'a') {
-	  v = *cp - 'a' + 10;
-	}
-	else {
-	  v = *cp - 'A' + 10;
-	}
-	if (n > UINT64_C (0xFFFFFFFFFFFFFFF)) {
+      do {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 16 + v;
-	cp++;
-      } while (isxdigit (*cp));
+	u = *++cp;
+      } while (isxdigit (u));
     }
     else {
-      while (*cp >= '0' && *cp <= '7') {
-	uint32_t v = *cp - '0';
+      uint64_t max = maxp[8];
+      uint64_t rem = remp[8];
+      unsigned char u = *cp;
 
-	if (n > UINT64_C (0x1FFFFFFFFFFFFFFF)) {
+      while (u >= '0' && u <= '7') {
+	uint32_t v = convert_num[u];
+
+	if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	  break;
 	}
 	n = n * 8 + v;
-	cp++;
+	u = *++cp;
       }
     }
   }
   else if (isdigit (*cp)) {
-    do {
-      uint32_t v = *cp - '0';
+    uint64_t max = maxp[10];
+    uint64_t rem = remp[10];
+    unsigned char u = *cp;
 
-      if (n > UINT64_C (1844674407370955161) ||
-	  (n == UINT64_C (1844674407370955161) && v > 6)) {
+    do {
+      uint32_t v = convert_num[u];
+
+      if (UNLIKELY (n >= max) && (n > max || (n == max && v > rem))) {
 	break;
       }
       n = n * 10 + v;
-      cp++;
-    } while (isdigit (*cp));
+      u = *++cp;
+    } while (isdigit (u));
   }
   else {
-    cp = (char *) str;
+    cp = (unsigned char *) str;
   }
   if (endptr) {
-    *endptr = cp;
+    *endptr = (char *) cp;
   }
   return n;
 }
@@ -5721,15 +5762,7 @@ fast_strtof (const char *str, char **endptr)
     c = 0;
     while (isxdigit (*cp)) {
       if (c < 16) {
-	if (*cp <= '9') {
-	  n = n * 16 + (*cp - '0');
-	}
-	else if (*cp >= 'a') {
-	  n = n * 16 + (*cp - 'a' + 10);
-	}
-	else {
-	  n = n * 16 + (*cp - 'A' + 10);
-	}
+	n = n * 16 + convert_num[*cp & 0xFFu];
       }
       else {
 	exp += 4;
@@ -5743,15 +5776,7 @@ fast_strtof (const char *str, char **endptr)
       cp++;
       while (isxdigit (*cp)) {
 	if (c < 16) {
-	  if (*cp <= '9') {
-	    n = n * 16 + (*cp - '0');
-	  }
-	  else if (*cp >= 'a') {
-	    n = n * 16 + (*cp - 'a' + 10);
-	  }
-	  else {
-	    n = n * 16 + (*cp - 'A' + 10);
-	  }
+	  n = n * 16 + convert_num[*cp & 0xFFu];
 	  exp -= 4;
 	}
 	cp++;
@@ -5974,15 +5999,7 @@ fast_strtod (const char *str, char **endptr)
     c = 0;
     while (isxdigit (*cp)) {
       if (c < 16) {
-	if (*cp <= '9') {
-	  n1 = n1 * 16 + (*cp - '0');
-	}
-	else if (*cp >= 'a') {
-	  n1 = n1 * 16 + (*cp - 'a' + 10);
-	}
-	else {
-	  n1 = n1 * 16 + (*cp - 'A' + 10);
-	}
+	n1 = n1 * 16 + convert_num[*cp & 0xFFu];
       }
       else {
 	exp += 4;
@@ -5996,15 +6013,7 @@ fast_strtod (const char *str, char **endptr)
       cp++;
       while (isxdigit (*cp)) {
 	if (c < 16) {
-	  if (*cp <= '9') {
-	    n1 = n1 * 16 + (*cp - '0');
-	  }
-	  else if (*cp >= 'a') {
-	    n1 = n1 * 16 + (*cp - 'a' + 10);
-	  }
-	  else {
-	    n1 = n1 * 16 + (*cp - 'A' + 10);
-	  }
+	  n1 = n1 * 16 + convert_num[*cp & 0xFFu];
 	  exp -= 4;
 	}
 	cp++;
