@@ -76,6 +76,9 @@ init (uint64_t r, unsigned int sign, unsigned int size, unsigned int base,
     if (prefix && base == 8) {
       *--cp = '0';
     }
+    if (prefix && base == 10) {
+      *--cp = '0';
+    }
     if (prefix && base == 16) {
       *--cp = 'x';
       *--cp = '0';
@@ -615,6 +618,70 @@ main (int argc, char **argv)
   if (*endptr != 'k') {
     printf ("fast_strtou64: failed endptr %s\n", endptr);
   }
+  for (i = 0; i < sizeof (sitst) / sizeof (sitst[0]); i++) {
+    for (j = 2; j < 36; j++) {
+      len = fast_base_sint32 (sitst[i].v, line, j, 0);
+      if (fast_strtos32 (line, &endptr, j) != sitst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_sint32: conversion failed for %d %s(%u)\n",
+		sitst[i].v, line, len);
+      }
+      len = fast_base_sint32 (sitst[i].v, line, j, 1);
+      if (fast_strtos32 (line, &endptr, j) != sitst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_sint32: conversion failed for %d %s(%u)\n",
+		sitst[i].v, line, len);
+      }
+    }
+  }
+  for (i = 0; i < sizeof (uitst) / sizeof (uitst[0]); i++) {
+    for (j = 2; j < 36; j++) {
+      len = fast_base_uint32 (uitst[i].v, line, j, 0);
+      if (fast_strtou32 (line, &endptr, j) != uitst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_uint32: conversion failed for %u %s(%u)\n",
+		uitst[i].v, line, len);
+      }
+      len = fast_base_uint32 (uitst[i].v, line, j, 1);
+      if (fast_strtou32 (line, &endptr, j) != uitst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_uint32: conversion failed for %u %s(%u)\n",
+		uitst[i].v, line, len);
+      }
+    }
+  }
+  for (i = 0; i < sizeof (sltst) / sizeof (sltst[0]); i++) {
+    for (j = 2; j < 36; j++) {
+      len = fast_base_sint64 (sltst[i].v, line, j, 0);
+      if (fast_strtos64 (line, &endptr, j) != sltst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_sint32: conversion failed for %" PRId64
+		" %s(%u)\n", sltst[i].v, line, len);
+      }
+      len = fast_base_sint64 (sltst[i].v, line, j, 1);
+      if (fast_strtos64 (line, &endptr, j) != sltst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_sint32: conversion failed for %" PRId64
+		" %s(%u)\n", sltst[i].v, line, len);
+      }
+    }
+  }
+  for (i = 0; i < sizeof (ultst) / sizeof (ultst[0]); i++) {
+    for (j = 2; j < 36; j++) {
+      len = fast_base_uint64 (ultst[i].v, line, j, 0);
+      if (fast_strtou64 (line, &endptr, j) != ultst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_uint64: conversion failed for %" PRIu64
+		" %s(%u)\n", ultst[i].v, line, len);
+      }
+      len = fast_base_uint64 (ultst[i].v, line, j, 1);
+      if (fast_strtou64 (line, &endptr, j) != ultst[i].v ||
+	  *endptr != '\0' || len != strlen (line)) {
+	printf ("fast_base_uint64: conversion failed for %" PRIu64
+		" %s(%u)\n", ultst[i].v, line, len);
+      }
+    }
+  }
   for (i = 0; i < sizeof (ftst) / sizeof (ftst[0]); i++) {
     tf.u = ftst[i];
     fast_ftoa (tf.f, PREC_FLT_NR, line);
@@ -877,8 +944,8 @@ main (int argc, char **argv)
     uint64_t n1;
     uint64_t n2;
     uint64_t count = 100000000;
-    int prefix[] = { 0, 0, 1, 0, 0, 0, 1, 0 };
-    int base[] = { 2, 8, 8, 10, 12, 16, 16, 36 };
+    int prefix[] = { 0, 0, 1, 0, 1, 0, 0, 1, 0 };
+    int base[] = { 2, 8, 8, 10, 10, 12, 16, 16, 36 };
 
     n1 = 0;
     n2 = 0;
@@ -887,7 +954,10 @@ main (int argc, char **argv)
       r = init (r, 1, 32, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n1 += fast_strtos32 (str[i & M], NULL, base[b]);
+	n1 += fast_strtos32 (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("fast_strtos32: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("fast_strtos32(%2d%c): %12.9f\n", base[b],
@@ -898,7 +968,10 @@ main (int argc, char **argv)
       r = init (r, 1, 32, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n2 += strtol (str[i & M], NULL, base[b]);
+	n2 += strtol (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("strtol: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("strtol(%2d%c):        %12.9f\n", base[b],
@@ -914,7 +987,10 @@ main (int argc, char **argv)
       r = init (r, 1, 64, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n1 += fast_strtos64 (str[i & M], NULL, base[b]);
+	n1 += fast_strtos64 (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("fast_strtos64: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("fast_strtos64(%2d%c): %12.9f\n", base[b],
@@ -925,7 +1001,10 @@ main (int argc, char **argv)
       r = init (r, 1, 64, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n2 += strtoll (str[i & M], NULL, base[b]);
+	n2 += strtoll (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("strtoll: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("strtoll(%2d%c):       %12.9f\n", base[b],
@@ -941,7 +1020,10 @@ main (int argc, char **argv)
       r = init (r, 0, 32, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n1 += fast_strtou32 (str[i & M], NULL, base[b]);
+	n1 += fast_strtou32 (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("fast_strtou32: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("fast_strtus32(%2d%c): %12.9f\n", base[b],
@@ -952,7 +1034,10 @@ main (int argc, char **argv)
       r = init (r, 0, 32, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n2 += strtoul (str[i & M], NULL, base[b]);
+	n2 += strtoul (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("strtoul: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("strtoul(%2d%c):       %12.9f\n", base[b],
@@ -968,7 +1053,10 @@ main (int argc, char **argv)
       r = init (r, 0, 64, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n1 += fast_strtou64 (str[i & M], NULL, base[b]);
+	n1 += fast_strtou64 (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("fast_strtou64: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("fast_strtou64(%2d%c): %12.9f\n", base[b],
@@ -979,7 +1067,10 @@ main (int argc, char **argv)
       r = init (r, 0, 64, base[b], prefix[b]);
       start = get_time ();
       for (i = 0; i < count; i++) {
-	n2 += strtoull (str[i & M], NULL, base[b]);
+	n2 += strtoull (str[i & M], &endptr, base[b]);
+	if (*endptr != '\0') {
+	  printf ("strtoull: %s\n", str[i & M]);
+	}
       }
       end = get_time ();
       printf ("strtoull(%2d%c):      %12.9f\n", base[b],

@@ -25,6 +25,8 @@
 #define UNLIKELY(x)             (x)
 #endif
 
+#define	DO_BASE(b) case b: do { *--p = d[u % b]; u /= b; } while (u); break
+
 #if 0
 /* gcc -g -O3 -Wall a.c -o a -lmpfr -lgmp */
 #include <stdio.h>
@@ -4623,6 +4625,277 @@ fast_uint64 (uint64_t v, char *str)
   do_uint (v, str, p - str);
 #endif
   return len;
+}
+
+/** \brief fast_base_sint32
+ * 
+ * \b Description
+ *
+ * Convert signed integer to string with base and upper case
+ *
+ * \param v Integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+
+unsigned int
+fast_base_sint32 (int32_t s, char *str, int base, int upper)
+{
+  const char *d = upper ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    : "0123456789abcdefghijklmnopqrstuvwxyz";
+  char tmp[100];
+  char *p = &tmp[sizeof (tmp) - 1];
+  unsigned int is_signed = s < 0;
+  uint32_t u = (uint32_t) s;
+
+  *p = '\0';
+  if (is_signed) {
+    u = ~u + 1;
+  }
+  switch (base) {
+    DO_BASE (2);
+    DO_BASE (3);
+    DO_BASE (4);
+    DO_BASE (5);
+    DO_BASE (6);
+    DO_BASE (7);
+    DO_BASE (8);
+    DO_BASE (9);
+  case 10:
+    return fast_sint32 (s, str);
+    DO_BASE (11);
+    DO_BASE (12);
+    DO_BASE (13);
+    DO_BASE (14);
+    DO_BASE (15);
+    DO_BASE (16);
+    DO_BASE (17);
+    DO_BASE (18);
+    DO_BASE (19);
+    DO_BASE (20);
+    DO_BASE (21);
+    DO_BASE (22);
+    DO_BASE (23);
+    DO_BASE (24);
+    DO_BASE (25);
+    DO_BASE (26);
+    DO_BASE (27);
+    DO_BASE (28);
+    DO_BASE (29);
+    DO_BASE (30);
+    DO_BASE (31);
+    DO_BASE (32);
+    DO_BASE (33);
+    DO_BASE (34);
+    DO_BASE (35);
+    DO_BASE (36);
+  }
+  if (is_signed) {
+    *--p = '-';
+  }
+  memcpy (str, p, &tmp[sizeof (tmp)] - p);
+  return &tmp[sizeof (tmp) - 1] - p;
+}
+
+/** \brief fast_base_sint64
+ * 
+ * \b Description
+ *
+ * Convert signed long integer to string with base and upper case
+ *
+ * \param v Long integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+unsigned int
+fast_base_sint64 (int64_t s, char *str, int base, int upper)
+{
+  const char *d = upper ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    : "0123456789abcdefghijklmnopqrstuvwxyz";
+  char tmp[100];
+  char *p = &tmp[sizeof (tmp) - 1];
+  unsigned int is_signed = s < 0;
+  uint64_t u = (uint64_t) s;
+
+  *p = '\0';
+  if (is_signed) {
+    u = ~u + 1;
+  }
+  switch (base) {
+    DO_BASE (2);
+    DO_BASE (3);
+    DO_BASE (4);
+    DO_BASE (5);
+    DO_BASE (6);
+    DO_BASE (7);
+    DO_BASE (8);
+    DO_BASE (9);
+  case 10:
+    return fast_sint64 (s, str);
+    DO_BASE (11);
+    DO_BASE (12);
+    DO_BASE (13);
+    DO_BASE (14);
+    DO_BASE (15);
+    DO_BASE (16);
+    DO_BASE (17);
+    DO_BASE (18);
+    DO_BASE (19);
+    DO_BASE (20);
+    DO_BASE (21);
+    DO_BASE (22);
+    DO_BASE (23);
+    DO_BASE (24);
+    DO_BASE (25);
+    DO_BASE (26);
+    DO_BASE (27);
+    DO_BASE (28);
+    DO_BASE (29);
+    DO_BASE (30);
+    DO_BASE (31);
+    DO_BASE (32);
+    DO_BASE (33);
+    DO_BASE (34);
+    DO_BASE (35);
+    DO_BASE (36);
+  }
+  if (is_signed) {
+    *--p = '-';
+  }
+  memcpy (str, p, &tmp[sizeof (tmp)] - p);
+  return &tmp[sizeof (tmp) - 1] - p;
+}
+
+/** \brief fast_uint32
+ * 
+ * \b Description
+ *
+ * Convert unsigned base_integer to string with base and upper case
+ *
+ * \param v Integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+
+unsigned int
+fast_base_uint32 (uint32_t u, char *str, int base, int upper)
+{
+  const char *d = upper ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    : "0123456789abcdefghijklmnopqrstuvwxyz";
+  char tmp[100];
+  char *p = &tmp[sizeof (tmp) - 1];
+
+  *p = '\0';
+  switch (base) {
+    DO_BASE (2);
+    DO_BASE (3);
+    DO_BASE (4);
+    DO_BASE (5);
+    DO_BASE (6);
+    DO_BASE (7);
+    DO_BASE (8);
+    DO_BASE (9);
+  case 10:
+    return fast_uint32 (u, str);
+    DO_BASE (11);
+    DO_BASE (12);
+    DO_BASE (13);
+    DO_BASE (14);
+    DO_BASE (15);
+    DO_BASE (16);
+    DO_BASE (17);
+    DO_BASE (18);
+    DO_BASE (19);
+    DO_BASE (20);
+    DO_BASE (21);
+    DO_BASE (22);
+    DO_BASE (23);
+    DO_BASE (24);
+    DO_BASE (25);
+    DO_BASE (26);
+    DO_BASE (27);
+    DO_BASE (28);
+    DO_BASE (29);
+    DO_BASE (30);
+    DO_BASE (31);
+    DO_BASE (32);
+    DO_BASE (33);
+    DO_BASE (34);
+    DO_BASE (35);
+    DO_BASE (36);
+  }
+  memcpy (str, p, &tmp[sizeof (tmp)] - p);
+  return &tmp[sizeof (tmp) - 1] - p;
+}
+
+/** \brief fast_base_uint64
+ * 
+ * \b Description
+ *
+ * Convert unsigned long integer to string with base and upper case
+ *
+ * \param v Long integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+
+unsigned int
+fast_base_uint64 (uint64_t u, char *str, int base, int upper)
+{
+  const char *d = upper ? "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    : "0123456789abcdefghijklmnopqrstuvwxyz";
+  char tmp[100];
+  char *p = &tmp[sizeof (tmp) - 1];
+
+  *p = '\0';
+  switch (base) {
+    DO_BASE (2);
+    DO_BASE (3);
+    DO_BASE (4);
+    DO_BASE (5);
+    DO_BASE (6);
+    DO_BASE (7);
+    DO_BASE (8);
+    DO_BASE (9);
+  case 10:
+    return fast_uint64 (u, str);
+    DO_BASE (11);
+    DO_BASE (12);
+    DO_BASE (13);
+    DO_BASE (14);
+    DO_BASE (15);
+    DO_BASE (16);
+    DO_BASE (17);
+    DO_BASE (18);
+    DO_BASE (19);
+    DO_BASE (20);
+    DO_BASE (21);
+    DO_BASE (22);
+    DO_BASE (23);
+    DO_BASE (24);
+    DO_BASE (25);
+    DO_BASE (26);
+    DO_BASE (27);
+    DO_BASE (28);
+    DO_BASE (29);
+    DO_BASE (30);
+    DO_BASE (31);
+    DO_BASE (32);
+    DO_BASE (33);
+    DO_BASE (34);
+    DO_BASE (35);
+    DO_BASE (36);
+  }
+  memcpy (str, p, &tmp[sizeof (tmp)] - p);
+  return &tmp[sizeof (tmp) - 1] - p;
 }
 
 /** \brief fast_strtos32

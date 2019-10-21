@@ -71,6 +71,66 @@ extern "C"
  */
   extern unsigned int fast_uint64 (uint64_t v, char *str);
 
+/** \brief fast_base_sint32
+ * 
+ * \b Description
+ *
+ * Convert signed integer to string with base and upper case
+ *
+ * \param v Integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+  extern unsigned int fast_base_sint32 (int32_t v, char *str, int base,
+					int upper);
+
+/** \brief fast_base_sint64
+ * 
+ * \b Description
+ *
+ * Convert signed long integer to string with base and upper case
+ *
+ * \param v Long integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+  extern unsigned int fast_base_sint64 (int64_t v, char *str, int base,
+					int upper);
+
+/** \brief fast_uint32
+ * 
+ * \b Description
+ *
+ * Convert unsigned base_integer to string with base and upper case
+ *
+ * \param v Integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+  extern unsigned int fast_base_uint32 (uint32_t v, char *str, int base,
+					int upper);
+
+/** \brief fast_base_uint64
+ * 
+ * \b Description
+ *
+ * Convert unsigned long integer to string with base and upper case
+ *
+ * \param v Long integer
+ * \param str Buffer to print to
+ * \param base Base to use
+ * \param upper Use uppecase
+ * \returns lenght string
+ */
+  extern unsigned int fast_base_uint64 (uint64_t v, char *str, int base,
+					int upper);
+
 /** \brief fast_strtos32
  * 
  * \b Description
