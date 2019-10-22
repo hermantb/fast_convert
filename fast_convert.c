@@ -4307,7 +4307,7 @@ mul_10_add (uint64_t * m, uint64_t * l, uint32_t a)
  * \returns n * m >> 96
  */
 
-#if defined(__x86_64__)
+#if defined (__GNUC__) && defined(__x86_64__)
 static const uint64_t
 mul_96 (const uint64_t n, const uint64_t m, const uint32_t o, uint32_t * low)
 {
@@ -4359,7 +4359,7 @@ mul_96 (const uint64_t n, const uint64_t m, const uint32_t o, uint32_t * low)
  * \returns n * m >> 64
  */
 
-#if defined(__x86_64__)
+#if defined (__GNUC__) && defined(__x86_64__)
 static const uint64_t
 mul_64 (const uint64_t n, const uint64_t m)
 {
@@ -4402,7 +4402,7 @@ mul_64 (const uint64_t n, const uint64_t m)
  * \returns n * m >> 56
  */
 
-#if defined(__x86_64__)
+#if defined (__GNUC__) && defined(__x86_64__)
 static const uint64_t
 mul_56 (const uint32_t n, const uint64_t m, uint32_t * low)
 {
