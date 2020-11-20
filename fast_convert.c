@@ -4001,13 +4001,24 @@ static void __attribute__((constructor))
 
 #ifndef __GNUC__
 
-#define	USE_FAST_CTZ	1
-
-#if USE_FAST_CTZ
-static const unsigned int fast_clz[16] = {
-  4, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0
+static const unsigned char fast_clz[256] = {
+  0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4,
+  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 };
-#endif
 
 /** \brief calc_clz32
  * 
@@ -4022,32 +4033,12 @@ static const unsigned int fast_clz[16] = {
 static unsigned int
 calc_clz32 (uint32_t x)
 {
-  unsigned int n = 0;
+  unsigned int n;
 
-  if ((x & 0xFFFF0000) == 0) {
-    n = 16;
-    x <<= 16;
-  }
-  if ((x & 0xFF000000) == 0) {
-    n += 8;
-    x <<= 8;
-  }
-  if ((x & 0xF0000000) == 0) {
-    n += 4;
-    x <<= 4;
-  }
-#if USE_FAST_CTZ
-  n += fast_clz[x >> (32 - 4)];
-#else
-  if ((x & 0xC0000000) == 0) {
-    n += 2;
-    x <<= 2;
-  }
-  if ((x & 0x80000000) == 0) {
-    n += 1;
-  }
-#endif
-  return n;
+  return (n = (x >> 24)) ? 8 - fast_clz[n] :
+    (n = (x >> 16)) ? 16 - fast_clz[n] :
+    (n = (x >> 8)) ? 24 - fast_clz[n] :
+    32 - fast_clz[x];
 }
 
 /** \brief calc_clz64
@@ -4063,36 +4054,17 @@ calc_clz32 (uint32_t x)
 static unsigned int
 calc_clz64 (uint64_t x)
 {
-  unsigned int n = 0;
+  unsigned int n, t;
 
-  if ((x & UINT64_C (0xFFFFFFFF00000000)) == 0) {
-    n = 32;
-    x <<= 32;
-  }
-  if ((x & UINT64_C (0xFFFF000000000000)) == 0) {
-    n += 16;
-    x <<= 16;
-  }
-  if ((x & UINT64_C (0xFF00000000000000)) == 0) {
-    n += 8;
-    x <<= 8;
-  }
-  if ((x & UINT64_C (0xF000000000000000)) == 0) {
-    n += 4;
-    x <<= 4;
-  }
-#if USE_FAST_CTZ
-  n += fast_clz[x >> (64 - 4)];
-#else
-  if ((x & UINT64_C (0xC000000000000000)) == 0) {
-    n += 2;
-    x <<= 2;
-  }
-  if ((x & UINT64_C (0x8000000000000000)) == 0) {
-    n += 1;
-  }
-#endif
-  return n;
+  return ((t = (x >> 32))) ?
+    ((n = (t >> 24)) ? 8 - fast_clz[n] :
+     (n = (t >> 16)) ? 16 - fast_clz[n] :
+     (n = (t >> 8)) ? 24 - fast_clz[n] :
+     32 - fast_clz[t]) :
+    ((n = (x >> 24)) ? 40 - fast_clz[n] :
+     (n = (x >> 16)) ? 48 - fast_clz[n] :
+     (n = (x >> 8)) ? 56 - fast_clz[n] :
+     64 - fast_clz[x]);
 }
 #endif
 

@@ -1,6 +1,6 @@
 OPTIONS = -g -O3 -Wall
 CC = gcc
-WIN_GCC = i686-w64-mingw32-gcc
+WIN_GCC = x86_64-w64-mingw32-gcc
 
 # -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined
 # -fsanitize-address-use-after-scope
