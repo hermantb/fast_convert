@@ -27,6 +27,10 @@
 
 #define	DO_BASE(b) case b: do { *--p = d[u % b]; u /= b; } while (u); break
 
+#ifdef __attribute__
+#undef __attribute__
+#endif
+
 #if 0
 /* gcc -g -O3 -Wall a.c -o a -lmpfr -lgmp */
 #include <stdio.h>
